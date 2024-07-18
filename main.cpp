@@ -41,7 +41,6 @@ struct Payroll {
     Payroll() = default;
 };
 
-
 struct PayrollTotals {
     double regHours = 0.0;
     double otHours = 0.0;
@@ -63,7 +62,7 @@ const int MAX_REG_HOURS = 40;
 const int MAX_HOURS_WORKED = 50;
 const double MIN_HOURLY_RATE = 10.00;
 const double MAX_HOURLY_RATE = 30.00;
-const double FICA_PCT = .20;
+const double FICA_PCT = .20; //20 8 * 0.01
 const double SS_MED_PCT = .0765;
 const double OT_MULT = 1.5;
 const int MAX_TOTALS = 2;
@@ -137,20 +136,26 @@ int main() {
                     sOneEmployee = getEmployeeInfo();
                     vEmployees.push_back(sOneEmployee);
                 }
+
             // input employees
                 break;
-            case 2:
+            case '2':
                 vPayroll = inputHours(vEmployees);
             //input hours
-            case 3:
+                break;
+            case '3':
                 // calc payroll
                 vPayroll = calcPayroll(vEmployees, vPayroll);
-            case 4:
-            // calc totals
-            case 5:
-            // print payroll
+                break;
+            case '4':
+                // calc totals
+                break;
+            case '5':
+                // print payroll
+                break;
             case 'X':
                 processMenu = false;
+                break;
         } // switch
 
         //display menu - function
@@ -385,7 +390,7 @@ char getSelection() {
 
 struct Employee getEmployeeInfo() {
     /*
-    * ï	User input
+    * �	User input
     o	string firstname;
     o	string lastname;
     o	int empNum;
@@ -398,15 +403,16 @@ struct Employee getEmployeeInfo() {
     sOneEmployee.empNum = getEmpNumber();
     cout << "What is employee " << sOneEmployee.empNum << "'s firstname ? ";
     getline(cin, sOneEmployee.firstname);
-    //get lastname
-    //get regular rate
-    //calc ot rate
+    cout << "What is employee " << sOneEmployee.empNum << "'s firstname ? ";
+    getline(cin, sOneEmployee.lastname);
+    sOneEmployee.regRate = getFloat("What is employee's regular rate? ");
+    sOneEmployee.otRate = (sOneEmployee.regRate * OT_MULT);
 
     return sOneEmployee;
 }
 
 vector<Payroll> inputHours(vector<Employee> vEmployees) {
-    vector<Payroll> vPayroll;
+    vector<Payroll> vPayroll(MAX_EMPLOYEES);
 
     for (int i = 0; i < vEmployees.size(); i++) {
         cout << "How many hours did " << vEmployees[i].firstname << " " << vEmployees[i].lastname << " work? ";
