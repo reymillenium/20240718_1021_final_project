@@ -1,4 +1,3 @@
-
 /*
 * Your Name
 * Final Project
@@ -41,7 +40,6 @@ struct Payroll {
 
     Payroll() = default;
 };
-
 
 
 struct PayrollTotals {
