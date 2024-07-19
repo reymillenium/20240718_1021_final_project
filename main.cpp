@@ -24,16 +24,17 @@
 using namespace std;
 
 // Global Constants
-constexpr int MAX_EMPLOYEES = 3;
+// constexpr int MAX_EMPLOYEES = 3;
 constexpr int MAX_REG_HOURS = 40;
 constexpr int MAX_HOURS_WORKED = 50;
+constexpr int MAX_OT_HOURS = MAX_HOURS_WORKED - MAX_REG_HOURS;
 constexpr double MIN_HOURLY_RATE = 10.00;
 constexpr double MAX_HOURLY_RATE = 30.00;
 constexpr double FICA_PCT = .20; //20 8 * 0.01
 constexpr double SS_MED_PCT = .0765;
 constexpr double OT_MULT = 1.5;
-constexpr int MAX_TOTALS = 3;
-constexpr int SENTINEL = -999;
+// constexpr int MAX_TOTALS = 3;
+// constexpr int SENTINEL = -999;
 constexpr char QUITTING_OPTION = 'X';
 
 
@@ -409,7 +410,7 @@ void printLine(const T &item) {
 template<typename T>
 void printLineNTimes(const T &item, const int times) {
     for (int i = 0; i < times; i += 1) {
-        printl(item);
+        printLine(item);
     }
 }
 
@@ -1051,6 +1052,7 @@ void showProgramWelcome() {
 
 // Displays the menu to the user
 void displayMenu(const bool hasEmployees, const bool hasPayments) {
+    cout << endl;
     cout << "a. Input an Employee." << endl;
     if (hasEmployees)
         cout << "b. Input a Payment for an existing Employee." << endl;
@@ -1205,7 +1207,7 @@ void printCurrentEmployeePayrollReports(vector<Payment> &payments, const vector<
     } while (theEmployeeDoNotExist); // We are not leaving until we get an existing employee's id
 
     // Ok, but now we also need to know if besides existing, the employee has associated payments too
-    theEmployeeHasPayments = theEmployeeHasPayments(payments, employeeId);
+    theEmployeeHasPayments = employeeHasPayments(payments, employeeId);
 
     if (theEmployeeHasPayments) {
         // Next we retrieve the Employee, for future printing purposes, as the future table will look way better with that useful extra data
@@ -1249,7 +1251,6 @@ Employee getEmployeById(const vector<Employee> &employees, const string &employe
     // );
     // Employee employee = *employeeFirstIterator;
 
-    //find() ask for a value, and we use find_if() for a condition instead
     // Let's just return it directly instead
     return *find_if(employees.begin(), employees.end(), [&](const Employee &emp) { return emp.id == employeeId; });
 }
@@ -1297,6 +1298,7 @@ EmployeePayrollReport createAverageEmployeePayrollReport(vector<Payment> &paymen
 
 // Pints on the console both, the addition & average PayrollReports of the company
 void printCompanyPayrollReports(const PayrollReport &additionPR, const PayrollReport &averagePR) {
+    printPayrollReportsTable(additionPR, averagePR);
 }
 
 // Prints on the console both, the addition & average given EmployeePayrollReports
@@ -1309,27 +1311,29 @@ void printEmployeePayrollReports(const EmployeePayrollReport &additionEPR, const
 // Prints either a EmployeePayrollReport or a PayrollReport structure variable, with addition and average data,
 // as we pass as argument a father struct PayrollReport variable, and from the received parameter we won't use the employee's id anyway at this point (either done before or not needed)
 void printPayrollReportsTable(const PayrollReport &additionPR, const PayrollReport &averagePR) {
-    constexpr int MAX_AMOUNT_DASHES = 48;
+    constexpr int MAX_ROW_WIDTH = 48;
+    constexpr int ADDITION_COL_INNER_WIDTH = 12;
+    constexpr int AVERAGE_COL_INNER_WIDTH = 11;
 
-    printLineNTimes("-", MAX_AMOUNT_DASHES);
+    printLineNTimes("-", MAX_ROW_WIDTH);
     cout << "|       Field       |   Addition   |   Average   |" << endl;
-    printLineNTimes("-", MAX_AMOUNT_DASHES);
-    cout << "|  Regular Hours    | " << setw(12) << left << additionPR.regHours << " | " << setw(11) << left << averagePR.regHours << " |" << endl;
-    printLineNTimes("-", MAX_AMOUNT_DASHES);
-    cout << "|  Overtime Hours   | " << setw(12) << left << additionPR.otHours << " | " << setw(11) << left << averagePR.otHours << " |" << endl;
-    printLineNTimes("-", MAX_AMOUNT_DASHES);
-    cout << "|  Regular Pay      | " << setw(12) << left << additionPR.regPay << " | " << setw(11) << left << averagePR.regPay << " |" << endl;
-    printLineNTimes("-", MAX_AMOUNT_DASHES);
-    cout << "|  Overtime Pay     | " << setw(12) << left << additionPR.otPay << " | " << setw(11) << left << averagePR.otPay << " |" << endl;
-    printLineNTimes("-", MAX_AMOUNT_DASHES);
-    cout << "|       FICA        | " << setw(12) << left << additionPR.fica << " | " << setw(11) << left << averagePR.fica << " |" << endl;
-    printLineNTimes("-", MAX_AMOUNT_DASHES);
-    cout << "|  Social Security  | " << setw(12) << left << additionPR.socSec << " | " << setw(11) << left << averagePR.socSec << " |" << endl;
-    printLineNTimes("-", MAX_AMOUNT_DASHES);
-    cout << "|     Total Pay     | " << setw(12) << left << additionPR.totalPay() << " | " << setw(11) << left << averagePR.totalPay() << " |" << endl;
-    printLineNTimes("-", MAX_AMOUNT_DASHES);
-    cout << "|  Total Deductions | " << setw(12) << left << additionPR.totDeductions() << " | " << setw(11) << left << averagePR.totDeductions() << " |" << endl;
-    printLineNTimes("-", MAX_AMOUNT_DASHES);
-    cout << "|      Net Pay      | " << setw(12) << left << additionPR.netPay() << " | " << setw(11) << left << averagePR.netPay() << " |" << endl;
-    printLineNTimes("-", MAX_AMOUNT_DASHES);
+    printLineNTimes("-", MAX_ROW_WIDTH);
+    cout << "|  Regular Hours    | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.regHours << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.regHours << " |" << endl;
+    printLineNTimes("-", MAX_ROW_WIDTH);
+    cout << "|  Overtime Hours   | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.otHours << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.otHours << " |" << endl;
+    printLineNTimes("-", MAX_ROW_WIDTH);
+    cout << "|  Regular Pay      | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.regPay << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.regPay << " |" << endl;
+    printLineNTimes("-", MAX_ROW_WIDTH);
+    cout << "|  Overtime Pay     | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.otPay << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.otPay << " |" << endl;
+    printLineNTimes("-", MAX_ROW_WIDTH);
+    cout << "|       FICA        | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.fica << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.fica << " |" << endl;
+    printLineNTimes("-", MAX_ROW_WIDTH);
+    cout << "|  Social Security  | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.socSec << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.socSec << " |" << endl;
+    printLineNTimes("-", MAX_ROW_WIDTH);
+    cout << "|     Total Pay     | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.totalPay() << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.totalPay() << " |" << endl;
+    printLineNTimes("-", MAX_ROW_WIDTH);
+    cout << "|  Total Deductions | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.totDeductions() << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.totDeductions() << " |" << endl;
+    printLineNTimes("-", MAX_ROW_WIDTH);
+    cout << "|      Net Pay      | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.netPay() << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.netPay() << " |" << endl;
+    printLineNTimes("-", MAX_ROW_WIDTH);
 }
