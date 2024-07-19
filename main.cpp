@@ -1,7 +1,21 @@
-/*
-* Your Name
-* Final Project
-*/
+/**
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                 *
+ *   Name: Reinier Garcia Ramos                                    *
+ *                                                                 *
+ *   Program Title: Final Project (Payroll Pro 2.0)                *
+ *                                                                 *
+ *   Purpose:                                                      *
+ *   Allows the user to enter the Employees data, their payments,  *
+ *   as well as printing the addition & average Payroll Reports    *
+ *   for a specific employee and for the whole company as well.    *
+ *                                                                 *
+ *   More Details:                                                 *
+ *   https://github.com/reymillenium/20240718_1021_final_project   *
+ *                                                                 *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ **/
+
 #include <iostream>
 #include <string>  // for string, to_string, etc
 #include <cmath> // for sqrt, sin, pow
@@ -24,7 +38,6 @@
 using namespace std;
 
 // Global Constants
-// constexpr int MAX_EMPLOYEES = 3;
 constexpr int MAX_REG_HOURS = 40;
 constexpr int MAX_HOURS_WORKED = 50;
 constexpr int MAX_OT_HOURS = MAX_HOURS_WORKED - MAX_REG_HOURS;
@@ -33,8 +46,6 @@ constexpr double MAX_HOURLY_RATE = 30.00;
 constexpr double FICA_PCT = .20; //20 8 * 0.01
 constexpr double SS_MED_PCT = .0765;
 constexpr double OT_MULT = 1.5;
-// constexpr int MAX_TOTALS = 3;
-// constexpr int SENTINEL = -999;
 constexpr char QUITTING_OPTION = 'X';
 
 
@@ -1210,9 +1221,12 @@ void addPayment(vector<Payment> &payments, const vector<Employee> &employees) {
 
 // Adds an Employe's Payment structure variable to the reference of a given vector of Payments
 void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
+    double otHours {0};
+
     cout << endl;
     const double regHours = getDouble("Please type how many regular hours the Employee worked", 1, MAX_REG_HOURS, true);;
-    const double otHours = getDouble("Please type how many overtime hours the Employee worked", 1, MAX_HOURS_WORKED - MAX_REG_HOURS, true);;
+    if (MAX_REG_HOURS <= regHours && regHours < MAX_HOURS_WORKED) // There is no point in asking for overtime if the employee dont even have the 40 weekly hours or if he already worked the legal maximum of 50
+        otHours = getDouble("Please type how many overtime hours the Employee worked", 1, MAX_HOURS_WORKED - MAX_REG_HOURS, true);
     payments.push_back(Payment {.employeeId = employee.id, .regHours = regHours, .otHours = otHours, .regRate = employee.regRate});
 }
 
