@@ -49,6 +49,10 @@ void print(const T &);
 template<typename T>
 void printNTimes(const T &, int);
 
+// Prints a given value, of almost any kind, N given times in the terminal, and then breaks the line
+template<typename T>
+void printNTimesAndBreak(const T &, int);
+
 // Prints a given value, of almost any kind, once in the terminal, and then breaks the line
 template<typename T>
 void printLine(const T &);
@@ -395,6 +399,14 @@ void print(const T &item) {
 // Prints a given value, of almost any kind, N given times in the terminal
 template<typename T>
 void printNTimes(const T &item, const int times) {
+    for (int i = 0; i < times; i += 1) {
+        print(item);
+    }
+}
+
+// Prints a given value, of almost any kind, N given times in the terminal, and then breaks the line
+template<typename T>
+void printNTimesAndBreak(const T &item, const int times) {
     for (int i = 0; i < times; i += 1) {
         print(item);
     }
@@ -1315,25 +1327,25 @@ void printPayrollReportsTable(const PayrollReport &additionPR, const PayrollRepo
     constexpr int ADDITION_COL_INNER_WIDTH = 12;
     constexpr int AVERAGE_COL_INNER_WIDTH = 11;
 
-    printLineNTimes("-", MAX_ROW_WIDTH);
+    printNTimesAndBreak("-", MAX_ROW_WIDTH);
     cout << "|       Field       |   Addition   |   Average   |" << endl;
-    printLineNTimes("-", MAX_ROW_WIDTH);
+    printNTimesAndBreak("-", MAX_ROW_WIDTH);
     cout << "|  Regular Hours    | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.regHours << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.regHours << " |" << endl;
-    printLineNTimes("-", MAX_ROW_WIDTH);
+    printNTimesAndBreak("-", MAX_ROW_WIDTH);
     cout << "|  Overtime Hours   | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.otHours << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.otHours << " |" << endl;
-    printLineNTimes("-", MAX_ROW_WIDTH);
+    printNTimesAndBreak("-", MAX_ROW_WIDTH);
     cout << "|  Regular Pay      | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.regPay << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.regPay << " |" << endl;
-    printLineNTimes("-", MAX_ROW_WIDTH);
+    printNTimesAndBreak("-", MAX_ROW_WIDTH);
     cout << "|  Overtime Pay     | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.otPay << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.otPay << " |" << endl;
-    printLineNTimes("-", MAX_ROW_WIDTH);
+    printNTimesAndBreak("-", MAX_ROW_WIDTH);
     cout << "|       FICA        | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.fica << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.fica << " |" << endl;
-    printLineNTimes("-", MAX_ROW_WIDTH);
+    printNTimesAndBreak("-", MAX_ROW_WIDTH);
     cout << "|  Social Security  | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.socSec << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.socSec << " |" << endl;
-    printLineNTimes("-", MAX_ROW_WIDTH);
+    printNTimesAndBreak("-", MAX_ROW_WIDTH);
     cout << "|     Total Pay     | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.totalPay() << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.totalPay() << " |" << endl;
-    printLineNTimes("-", MAX_ROW_WIDTH);
+    printNTimesAndBreak("-", MAX_ROW_WIDTH);
     cout << "|  Total Deductions | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.totDeductions() << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.totDeductions() << " |" << endl;
-    printLineNTimes("-", MAX_ROW_WIDTH);
+    printNTimesAndBreak("-", MAX_ROW_WIDTH);
     cout << "|      Net Pay      | " << setw(ADDITION_COL_INNER_WIDTH) << left << additionPR.netPay() << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << averagePR.netPay() << " |" << endl;
-    printLineNTimes("-", MAX_ROW_WIDTH);
+    printNTimesAndBreak("-", MAX_ROW_WIDTH);
 }
