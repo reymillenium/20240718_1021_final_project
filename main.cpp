@@ -37,7 +37,14 @@
 
 using namespace std;
 
-// Global Constants
+/**
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                         *
+ *                   GLOBAL CONSTANTS                      *
+ *                                                         *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ **/
+
 constexpr int MAX_REG_HOURS = 40;
 constexpr int MAX_HOURS_WORKED = 50;
 constexpr int MAX_OT_HOURS = MAX_HOURS_WORKED - MAX_REG_HOURS;
@@ -49,7 +56,13 @@ constexpr double OT_MULT = 1.5;
 constexpr char QUITTING_OPTION = 'X';
 
 
-// UTILITY FUNCTIONS PROTOTYPES
+/**
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                         *
+ *             UTILITY FUNCTIONS PROTOTYPES                *
+ *                                                         *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ **/
 
 
 // Prints a given value, of almost any kind, once in the terminal
@@ -249,6 +262,18 @@ string getLowerCase(string input);
 // Converts a string to uppercase and returns it
 string getUpperCase(string input);
 
+// Generates a unique id as a string. Format: bdc0a2fb-d39e-0242-9a0a-4e760153f18d
+string getUuid();
+
+
+/**
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                         *
+ *                STRUCTURE DEFINITIONS                    *
+ *                                                         *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ **/
+
 
 struct Employee {
     string firstName;
@@ -303,11 +328,14 @@ struct EmployeePayrollReport : PayrollReport {
     EmployeePayrollReport() = default;
 };
 
-// Generates a unique id as a string. Format: bdc0a2fb-d39e-0242-9a0a-4e760153f18d
-string getUuid();
 
-
-// CUSTOM MADE FUNCTIONS PROTOTYPES
+/**
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                         *
+ *           CUSTOM MADE FUNCTIONS PROTOTYPES              *
+ *                                                         *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ **/
 
 
 // Shows the program's welcoming message
@@ -376,6 +404,16 @@ void printEmployeePayrollReports(const EmployeePayrollReport &, const EmployeePa
 // as we pass as argument a father struct PayrollReport variable, and from the received parameter we won't use the employee's id anyway at this point (either done before or not needed)
 void printPayrollReportsTable(const PayrollReport &, const PayrollReport &);
 
+
+/**
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                         *
+ *                    MAIN FUNCTION                        *
+ *                                                         *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ **/
+
+
 int main() {
     vector<Employee> employees; // Our current employees
     vector<Payment> payments; // All the payments performed by the company to the employees. That's all we need.
@@ -403,7 +441,13 @@ int main() {
 }
 
 
-// UTILITY FUNCTIONS DEFINITIONS
+/**
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                         *
+ *            UTILITY FUNCTIONS DEFINITIONS                *
+ *                                                         *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ **/
 
 
 // Prints a given value, of almost any kind, once in the terminal
@@ -1077,7 +1121,13 @@ string getUuid() {
 }
 
 
-// CUSTOM MADE FUNCTIONS DEFINITIONS
+/**
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                         *
+ *          CUSTOM MADE FUNCTIONS DEFINITIONS              *
+ *                                                         *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ **/
 
 
 // Shows the program's welcoming message
