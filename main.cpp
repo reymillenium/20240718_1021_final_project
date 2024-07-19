@@ -309,7 +309,7 @@ bool isValidAnswer(char input, const vector<char> &);
 // Adds an Employee structure variable to the reference of a given vector of Employees
 void addEmployee(vector<Employee> &);
 
-//
+// Adds a Payment structure variable, associated to a specific Employee, to the reference of a given vector of Payments
 void addPayment(vector<Payment> &, const vector<Employee> &);
 
 void showEmployeesTable(const vector<Employee> &);
@@ -317,19 +317,23 @@ void showEmployeesTable(const vector<Employee> &);
 // Adds a Payment structure variable to the reference of a given vector of Payments
 void addPaymentToEmployee(vector<Payment> &, const Employee &);
 
-
 // Gets the option selected by the user, from the menu's options
 char getMenuSelection(bool, bool);
 
+// Prints on the terminal a PayrollReport for a specific Employee
+void printEmployeePayrollReport(vector<Payment> &, const vector<Employee> &);
+
+// Prints on the terminal a PayrollReport for the whole company
+void printCompanyPayrollReport(vector<Payment> &);
 
 int main() {
-    vector<Employee> employees; // Our current employes
+    vector<Employee> employees; // Our current employees
     vector<Payment> payments; // All the payments performed by the company to the employees. That's all we need.
     char menuSelection = 'A';
     bool hasEmployees = false;
     bool hasPayments = false;
 
-    // Shows the program's welcoming message
+    // Shows once the program's welcoming message
     showProgramWelcome();
 
     do {
@@ -1045,8 +1049,9 @@ void addEmployee(vector<Employee> &employees) {
     employees.push_back(Employee {.id = getUuid(), .firstName = firstName, .lastName = lastName, .regRate = regRate});
 }
 
-//
+// Adds a Payment structure variable, associated to a specific Employee, to the reference of a given vector of Payments
 void addPayment(vector<Payment> &payments, const vector<Employee> &employees) {
+    // First we show the employee's table to the user, so that the user can decide which employee to associate the new payment with
     showEmployeesTable(employees);
 }
 
@@ -1088,8 +1093,8 @@ void showEmployeesTable(const vector<Employee> &employees) {
 // Adds an Employe's Payment structure variable to the reference of a given vector of Payments
 void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
     cout << endl;
-    const double regHours = getDouble("please type how many regular hours the Employee worked", 1, MAX_REG_HOURS, true);;
-    const double otHours = getDouble("please type how many regular hours the Employee worked", 1, MAX_HOURS_WORKED - MAX_REG_HOURS, true);;
+    const double regHours = getDouble("Please type how many regular hours the Employee worked", 1, MAX_REG_HOURS, true);;
+    const double otHours = getDouble("Please type how many overtime hours the Employee worked", 1, MAX_HOURS_WORKED - MAX_REG_HOURS, true);;
     payments.push_back(Payment {.employeeId = employee.id, .regHours = regHours, .otHours = otHours, .regRate = employee.regRate});
 }
 
@@ -1103,10 +1108,10 @@ void processMenuSelection(const char menuSelection, vector<Employee> &employees,
             addPayment(payments, employees);
             break;
         case 'C':
-            // printEmployeePayrollReport
+            printEmployeePayrollReport(payments, employees);
             break;
         case 'D':
-            // printCompanyPayrollReport
+            printCompanyPayrollReport(payments);
             break;
         default: ;
     }
@@ -1138,4 +1143,14 @@ char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
     } while (isInvalidAnswer);
 
     return selection;
+}
+
+// Prints on the terminal a PayrollReport for a specific Employee
+void printEmployeePayrollReport(vector<Payment> &payments, const vector<Employee> &employees) {
+    // First we show the employee's table to the user, so that the user can decide for which employee he wants to print the Payment Report
+    showEmployeesTable(employees);
+}
+
+// Prints on the terminal a PayrollReport for the whole company
+void printCompanyPayrollReport(vector<Payment> &payments) {
 }
