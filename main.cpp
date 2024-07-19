@@ -330,7 +330,7 @@ char getMenuSelection(bool, bool);
 // Prints on the terminal a PayrollReport for a specific Employee
 void printCurrentEmployeePayrollReports(vector<Payment> &, const vector<Employee> &);
 
-// Prints on the terminal a PayrollReport for the whole company
+// Prints on the terminal both PayrollReports, addition & average, for the whole company
 void printCompanyPayrollReport(vector<Payment> &);
 
 // Determines if a given emloyeeID belongs to the current ones
@@ -345,10 +345,16 @@ Employee getEmployeById(const vector<Employee> &, const string &);
 // Generates a EmployeePayrollReport with the addition of all the Payment structure variables related to a given employee's id
 EmployeePayrollReport createAdditionEmployeePayrollReport(vector<Payment> &, const string &);
 
-// Generates a EmployeePayrollReport with the average of all the Payment structure variables related to a given employee's id
-EmployeePayrollReport createAverageEmployeePayrollReport(vector<Payment> &, const string &);
+// Generates a PayrollReport with the addition of all the Payment structure variables's data of the whole company across the time
+PayrollReport createAdditionPayrollReport(const vector<Payment> &);
 
-// Pints on the console both, the addition & average PayrollReports of the company
+// Generates a EmployeePayrollReport with the average of all the Payment structure variables related to a given employee's id
+EmployeePayrollReport createAverageEmployeePayrollReport(const vector<Payment> &, const string &);
+
+// Generates a PayrollReport with the average of all the Payment structure variables's data of the whole company across the time
+PayrollReport createAveragePayrollReport(const vector<Payment> &);
+
+// Prints on the console both, the addition & average PayrollReports of the company
 void printCompanyPayrollReports(const PayrollReport &, const PayrollReport &);
 
 // Prints on the console both, the addition & average given EmployeePayrollReports
@@ -1239,8 +1245,14 @@ void printCurrentEmployeePayrollReports(vector<Payment> &payments, const vector<
     }
 }
 
-// Prints on the terminal a PayrollReport for the whole company
+// Prints on the terminal both PayrollReports, addition & average, for the whole company
 void printCompanyPayrollReport(vector<Payment> &payments) {
+    // First we must generate the company's addition & average PayrollReports
+    PayrollReport additionPayrollReport = createAdditionPayrollReport(payments);
+    PayrollReport averagePayrollReport = createAveragePayrollReport(payments);
+
+    // And now we can finally send both to print
+    // printPayrollReports(additionPayrollReport, averagePayrollReport);
 }
 
 // Determines if a given emloyeeID belongs to the current ones
@@ -1271,10 +1283,10 @@ Employee getEmployeById(const vector<Employee> &employees, const string &employe
 }
 
 // Generates a EmployeePayrollReport with the addition of all the Payment structure variables related to a given employee's id
-EmployeePayrollReport createAdditionEmployeePayrollReport(vector<Payment> &payments, const string &employeeId) {
+EmployeePayrollReport createAdditionEmployeePayrollReport(const vector<Payment> &payments, const string &employeeId) {
     EmployeePayrollReport theAdditionEmployeePayrollReport {.employeeId = employeeId};
 
-    // So now we can increase each respective field, to leave it as an addition PayrollReport
+    // So now we can increase each respective field, to leave it as an addition EmployeePayrollReport
     for (const Payment &payment: payments) {
         if (payment.employeeId == employeeId) {
             theAdditionEmployeePayrollReport.paymentsAmount++;
@@ -1290,28 +1302,64 @@ EmployeePayrollReport createAdditionEmployeePayrollReport(vector<Payment> &payme
     return theAdditionEmployeePayrollReport;
 }
 
+// Generates a PayrollReport with the addition of all the Payment structure variables's data of the whole company across the time
+PayrollReport createAdditionPayrollReport(const vector<Payment> &payments) {
+    PayrollReport anAdditionPayrollReport;
+
+    // So now we can increase each respective field, to leave it as an addition PayrollReport
+    for (const Payment &payment: payments) {
+        anAdditionPayrollReport.paymentsAmount++;
+        anAdditionPayrollReport.regHours += payment.regHours;
+        anAdditionPayrollReport.otHours += payment.otHours;
+        anAdditionPayrollReport.regPay += payment.regPay();
+        anAdditionPayrollReport.otPay += payment.otPay();
+        anAdditionPayrollReport.fica += payment.fica();
+        anAdditionPayrollReport.socSec += payment.socSec();
+    }
+
+    return anAdditionPayrollReport;
+}
+
 // Generates a EmployeePayrollReport with the average of all the Payment structure variables related to a given employee's id
-EmployeePayrollReport createAverageEmployeePayrollReport(vector<Payment> &payments, const string &employeeId) {
+EmployeePayrollReport createAverageEmployeePayrollReport(const vector<Payment> &payments, const string &employeeId) {
     // First we get a good old fashion & regular PaymentReport based on the given employeeId
-    EmployeePayrollReport theAdditionEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employeeId);
+    EmployeePayrollReport anAdditionEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employeeId);
 
     // And now we must count how many payments has associated the employee to whom belongs the given id, so we can average his payment stats right after that
     // const int empoloyeePaymentsAmount = count_if(payments.begin(), payments.end(), [&](const Payment &payment) { return payment.employeeId == employeeId; });
-    const int employeePaymentsAmount = theAdditionEmployeePayrollReport.paymentsAmount;
+    const int employeePaymentsAmount = anAdditionEmployeePayrollReport.paymentsAmount; // It's way simpler & faster this way
 
-    // So now we can average/update each field, to leave it as an average PayrollReport
-    theAdditionEmployeePayrollReport.paymentsAmount = employeePaymentsAmount;
-    theAdditionEmployeePayrollReport.regHours /= employeePaymentsAmount;
-    theAdditionEmployeePayrollReport.otHours /= employeePaymentsAmount;
-    theAdditionEmployeePayrollReport.regPay /= employeePaymentsAmount;
-    theAdditionEmployeePayrollReport.otPay /= employeePaymentsAmount;
-    theAdditionEmployeePayrollReport.fica /= employeePaymentsAmount;
-    theAdditionEmployeePayrollReport.socSec /= employeePaymentsAmount;
+    // So now we can average/update each field, to leave it as an average EmployeePayrollReport
+    anAdditionEmployeePayrollReport.regHours /= employeePaymentsAmount;
+    anAdditionEmployeePayrollReport.otHours /= employeePaymentsAmount;
+    anAdditionEmployeePayrollReport.regPay /= employeePaymentsAmount;
+    anAdditionEmployeePayrollReport.otPay /= employeePaymentsAmount;
+    anAdditionEmployeePayrollReport.fica /= employeePaymentsAmount;
+    anAdditionEmployeePayrollReport.socSec /= employeePaymentsAmount;
 
-    return theAdditionEmployeePayrollReport;
+    return anAdditionEmployeePayrollReport;
 }
 
-// Pints on the console both, the addition & average PayrollReports of the company
+// Generates a PayrollReport with the average of all the Payment structure variables's data of the whole company across the time
+PayrollReport createAveragePayrollReport(const vector<Payment> &payments) {
+    // First we get a good old fashion & regular EmployeePayrollReport with addition data, of all the Payment structure variables's data of the whole company across the time
+    PayrollReport anAdditionPayrollReport = createAdditionPayrollReport(payments);
+
+    // And now we must count how many payments exist, so we can average the PayrollReport's stats right after that
+    const int companyPaymentsAmount = payments.size(); // It's way simpler & faster this way
+
+    // So now we can average/update each field, to leave it as an average PayrollReport
+    anAdditionPayrollReport.regHours /= companyPaymentsAmount;
+    anAdditionPayrollReport.otHours /= companyPaymentsAmount;
+    anAdditionPayrollReport.regPay /= companyPaymentsAmount;
+    anAdditionPayrollReport.otPay /= companyPaymentsAmount;
+    anAdditionPayrollReport.fica /= companyPaymentsAmount;
+    anAdditionPayrollReport.socSec /= companyPaymentsAmount;
+
+    return anAdditionPayrollReport;
+}
+
+// Prints on the console both, the addition & average PayrollReports of the company
 void printCompanyPayrollReports(const PayrollReport &additionPR, const PayrollReport &averagePR) {
     printPayrollReportsTable(additionPR, averagePR);
 }
