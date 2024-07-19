@@ -369,16 +369,14 @@ int main() {
     vector<Employee> employees; // Our current employees
     vector<Payment> payments; // All the payments performed by the company to the employees. That's all we need.
     char menuSelection = 'A';
-    bool hasEmployees = false;
-    bool hasPayments = false;
 
     // Shows once the program's welcoming message
     showProgramWelcome();
 
     do {
         // Adjusts accordingly the boolean variables
-        hasEmployees = !employees.empty();
-        hasPayments = !payments.empty();
+        const bool hasEmployees = !employees.empty();
+        const bool hasPayments = !payments.empty();
 
         // Displays the available options to the user
         displayMenu(hasEmployees, hasPayments);
@@ -561,7 +559,7 @@ string getString() {
 string humanizeInteger(const long long int integerValue) {
     const bool isNegative = integerValue < 0;
     string integerAsString = to_string(integerValue);
-    const int initialIndex = (integerAsString.length() - 3);
+    const int initialIndex = static_cast<int>(integerAsString.length() - 3);
     // We insert commas into the string every three digits, fromm right to left.
     for (int j = initialIndex; j > (isNegative ? 1 : 0); j -= 3) {
         integerAsString.insert(j, ",");
@@ -652,6 +650,7 @@ string ordinalFromNumber(const long long int number) {
                 case 3:
                     additive = "rd";
                     break;
+                default: ;
             }
     }
 
@@ -1045,19 +1044,25 @@ string getUpperCase(string input) {
 string getUuid() {
     static random_device dev;
     static mt19937 rng(dev());
-
     uniform_int_distribution<int> dist(0, 15);
+    constexpr bool mustAddDashes[] = {false, false, false, false, true, false, true, false, true, false, true, false, false, false, false, false};
+    string generatedID;
 
-    const char *v = "0123456789abcdef";
-    constexpr bool addDash[] = {false, false, false, false, true, false, true, false, true, false, true, false, false, false, false, false};
+    // for (int i = 0; i < 16; i++) {
+    //     const auto v = "0123456789abcdef";
+    //     if (mustAddDashes[i]) generatedID += "-";
+    //     generatedID += v[dist(rng)];
+    //     generatedID += v[dist(rng)];
+    // }
 
-    string res;
-    for (int i = 0; i < 16; i++) {
-        if (addDash[i]) res += "-";
-        res += v[dist(rng)];
-        res += v[dist(rng)];
+    const string allowedCharacters = "0123456789abcdef";
+    for (const bool mustAddDashNow: mustAddDashes) {
+        if (mustAddDashNow) generatedID += "-";
+        generatedID += allowedCharacters[dist(rng)];
+        generatedID += allowedCharacters[dist(rng)];
     }
-    return res;
+
+    return generatedID;
 }
 
 
@@ -1100,7 +1105,7 @@ char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
     if (hasPayments) allowedAnswers.insert(allowedAnswers.end(), ifHasPaymentsAnswers.begin(), ifHasPaymentsAnswers.end());
 
     do {
-        selection = toupper(getAlphaChar("Type your selection please"));
+        selection = static_cast<char>(toupper(getAlphaChar("Type your selection please"))); // Typecasting to avoid a warning
 
         isInvalidAnswer = !isValidMenuSelection(selection, allowedAnswers);
         if (isInvalidAnswer) {
@@ -1146,7 +1151,7 @@ void showEmployeesTable(const vector<Employee> &employees) {
                                                  [](const Employee &a, const Employee &b) {
                                                      return a.fullName().size() < b.fullName().size();
                                                  });
-    const size_t largestFullNameLength = largestEmployeeIter->fullName().size();
+    const int largestFullNameLength = static_cast<int>(largestEmployeeIter->fullName().size()); // Typecasting from size_t to int, just to avoid a warning
 
     // bdc0a2fb-d39e-0242-9a0a-4e760153f18d
     renderLineUnderTableRow(largestFullNameLength);
@@ -1157,7 +1162,7 @@ void showEmployeesTable(const vector<Employee> &employees) {
 
     renderLineUnderTableRow(largestFullNameLength);
 
-    for (const Employee employee: employees) {
+    for (const Employee &employee: employees) {
         cout << "| " << employee.id << " | " << setw(largestFullNameLength) << setfill(' ') << left << employee.fullName() << " |" << endl;
 
         renderLineUnderTableRow(largestFullNameLength);
@@ -1183,7 +1188,7 @@ void addEmployee(vector<Employee> &employees) {
 // Adds a Payment structure variable, associated to a specific Employee, to the reference of a given vector of Payments
 void addPayment(vector<Payment> &payments, const vector<Employee> &employees) {
     string employeeId;
-    bool theEmployeeDoNotExist = true;
+    bool theEmployeeDoNotExist;
 
     // First we show the employee's table to the user, so that the user can decide which employee to associate the new payment with
     showEmployeesTable(employees);
@@ -1214,8 +1219,8 @@ void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
 // Prints on the terminal a PayrollReport for a specific Employee
 void generateAndPrintCurrentEmployeePayrollReports(vector<Payment> &payments, const vector<Employee> &employees) {
     string employeeId;
-    bool theEmployeeDoNotExist = true;
-    bool theEmployeeHasPayments = true;
+    bool theEmployeeDoNotExist;
+    bool theEmployeeHasPayments;
 
     // First we show the employee's table to the user, so that the user can decide for which employee he wants to print the Payment Report
     showEmployeesTable(employees);
