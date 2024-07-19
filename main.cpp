@@ -241,6 +241,8 @@ struct Employee {
     double regRate {0.0};
 
     Employee() = default;
+
+    [[nodiscard]] string fullName() const { return firstName + " " + lastName; }
 };
 
 struct Payment {
@@ -297,15 +299,23 @@ void showProgramWelcome();
 void displayMenu(bool, bool);
 
 // Processes the selection made by the user from the menu
-void processMenuSelection(const char menuSelection, vector<Employee> &employees, vector<Payment> &payments);
+void processMenuSelection(char, vector<Employee> &, vector<Payment> &);
 
 
 // Validates and returns if the given answer is among the allowed answers
-bool isValidAnswer(const char input, const vector<char> &allowedAnswers);
+bool isValidAnswer(char input, const vector<char> &);
 
 
 // Adds an Employee structure variable to the reference of a given vector of Employees
-void addEmployee(vector<Employee> &employees);
+void addEmployee(vector<Employee> &);
+
+//
+void addPayment(vector<Payment> &, const vector<Employee> &);
+
+void showEmployeesTable(const vector<Employee> &);
+
+// Adds a Payment structure variable to the reference of a given vector of Payments
+void addPaymentToEmployee(vector<Payment> &, const Employee &);
 
 
 // Gets the option selected by the user, from the menu's options
@@ -323,12 +333,12 @@ int main() {
     showProgramWelcome();
 
     do {
-        // Displays the available options to the user
-        displayMenu(hasEmployees, hasPayments);
-
         // Adjusts accordingly the boolean variables
         hasEmployees = !employees.empty();
         hasPayments = !payments.empty();
+
+        // Displays the available options to the user
+        displayMenu(hasEmployees, hasPayments);
 
         // Gets the selected menu option from the user
         menuSelection = getMenuSelection(hasEmployees, hasPayments);
@@ -1019,7 +1029,6 @@ void displayMenu(const bool hasEmployees, const bool hasPayments) {
     }
     cout << "X. Exit the Program." << endl;
     cout << endl;
-    cout << "Type your selection please." << endl;
 }
 
 // Validates and returns if the given answer is among the allowed answers
@@ -1029,16 +1038,69 @@ bool isValidAnswer(const char input, const vector<char> &allowedAnswers) {
 
 // Adds an Employee structure variable to the reference of a given vector of Employees
 void addEmployee(vector<Employee> &employees) {
+    cout << endl;
+    const string firstName = getStringFromMessage("Please type the first name of the new Employee: ");
+    const string lastName = getStringFromMessage("Please type the last name of the new Employee: ");
+    const double regRate = getDouble("Please type the regular payment rate of the new Employee", MIN_HOURLY_RATE, MAX_HOURLY_RATE, true);
+    employees.push_back(Employee {.id = getUuid(), .firstName = firstName, .lastName = lastName, .regRate = regRate});
+}
+
+//
+void addPayment(vector<Payment> &payments, const vector<Employee> &employees) {
+    showEmployeesTable(employees);
+}
+
+
+void renderLineUnderTableRow(const int largestFullNameLength) {
+    cout << "-----------------------------------------";
+    printNTimes("-", largestFullNameLength);
+    cout << "--" << endl;
+}
+
+void showEmployeesTable(const vector<Employee> &employees) {
+    cout << endl;
+    cout << "Ok, these are the current employees:" << endl;
+    cout << endl;
+
+    // Finds the largest full name's length among the employees using max_element
+    const auto largestEmployeeIter = max_element(employees.begin(), employees.end(),
+                                                 [](const Employee &a, const Employee &b) {
+                                                     return a.fullName().size() < b.fullName().size();
+                                                 });
+    const size_t largestFullNameLength = largestEmployeeIter->fullName().size();
+
+    // bdc0a2fb-d39e-0242-9a0a-4e760153f18d
+    renderLineUnderTableRow(largestFullNameLength);
+
+    cout << "|                Unique ID             | Full Name ";
+    printNTimes(" ", largestFullNameLength - 10);
+    cout << " |" << endl;
+
+    renderLineUnderTableRow(largestFullNameLength);
+
+    for (const Employee employee: employees) {
+        cout << "| " << employee.id << " | " << setw(largestFullNameLength) << setfill(' ') << left << employee.fullName() << " |" << endl;
+
+        renderLineUnderTableRow(largestFullNameLength);
+    }
+}
+
+// Adds an Employe's Payment structure variable to the reference of a given vector of Payments
+void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
+    cout << endl;
+    const double regHours = getDouble("please type how many regular hours the Employee worked", 1, MAX_REG_HOURS, true);;
+    const double otHours = getDouble("please type how many regular hours the Employee worked", 1, MAX_HOURS_WORKED - MAX_REG_HOURS, true);;
+    payments.push_back(Payment {.employeeId = employee.id, .regHours = regHours, .otHours = otHours, .regRate = employee.regRate});
 }
 
 // Processes the selection made by the user from the menu
 void processMenuSelection(const char menuSelection, vector<Employee> &employees, vector<Payment> &payments) {
     switch (menuSelection) {
         case 'A':
-            // addEmployee
+            addEmployee(employees);
             break;
         case 'B':
-            // addPayment
+            addPayment(payments, employees);
             break;
         case 'C':
             // printEmployeePayrollReport
