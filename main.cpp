@@ -301,10 +301,8 @@ void displayMenu(bool, bool);
 // Processes the selection made by the user from the menu
 void processMenuSelection(char, vector<Employee> &, vector<Payment> &);
 
-
-// Validates and returns if the given answer is among the allowed answers
-bool isValidAnswer(char input, const vector<char> &);
-
+// Validates and returns if the given selection is among the allowed selections from the Menu
+bool isValidMenuSelection(char input, const vector<char> &);
 
 // Adds an Employee structure variable to the reference of a given vector of Employees
 void addEmployee(vector<Employee> &);
@@ -314,6 +312,9 @@ void addPayment(vector<Payment> &, const vector<Employee> &);
 
 void showEmployeesTable(const vector<Employee> &);
 
+// Prints an appropiate length "line" conformed by dashes, as part of a good looking table
+void renderLineUnderTableRow(int);
+
 // Adds a Payment structure variable to the reference of a given vector of Payments
 void addPaymentToEmployee(vector<Payment> &, const Employee &);
 
@@ -321,10 +322,25 @@ void addPaymentToEmployee(vector<Payment> &, const Employee &);
 char getMenuSelection(bool, bool);
 
 // Prints on the terminal a PayrollReport for a specific Employee
-void printEmployeePayrollReport(vector<Payment> &, const vector<Employee> &);
+void printCurrentEmployeePayrollReport(vector<Payment> &, const vector<Employee> &);
 
 // Prints on the terminal a PayrollReport for the whole company
 void printCompanyPayrollReport(vector<Payment> &);
+
+// Determines if a given emloyeeID belongs to the current ones
+bool existEmployee(const vector<Employee> &, const string &);
+
+// Determines if a given emloyee's id has associated at least one payment
+bool employeeHasPayments(const vector<Payment> &, const string &);
+
+// Retrieves an Employee structure variable by a given employee's id
+Employee getEmployeById(const vector<Employee> &, const string &);
+
+// Generates a EmployeePayrollReport with the addition of all the Payment structure variables related to a given employee's id
+EmployeePayrollReport createAdditionEmployeePayrollReport(vector<Payment> &, const string &);
+
+// Generates a EmployeePayrollReport with the average of all the Payment structure variables related to a given employee's id
+EmployeePayrollReport createAverageEmployeePayrollReport(vector<Payment> &, const string &);
 
 int main() {
     vector<Employee> employees; // Our current employees
@@ -1035,31 +1051,56 @@ void displayMenu(const bool hasEmployees, const bool hasPayments) {
     cout << endl;
 }
 
-// Validates and returns if the given answer is among the allowed answers
-bool isValidAnswer(const char input, const vector<char> &allowedAnswers) {
+// Validates and returns if the given selection is among the allowed selections from the Menu
+bool isValidMenuSelection(const char input, const vector<char> &allowedAnswers) {
     return count(allowedAnswers.begin(), allowedAnswers.end(), input) > 0;
 }
 
-// Adds an Employee structure variable to the reference of a given vector of Employees
-void addEmployee(vector<Employee> &employees) {
-    cout << endl;
-    const string firstName = getStringFromMessage("Please type the first name of the new Employee: ");
-    const string lastName = getStringFromMessage("Please type the last name of the new Employee: ");
-    const double regRate = getDouble("Please type the regular payment rate of the new Employee", MIN_HOURLY_RATE, MAX_HOURLY_RATE, true);
-    employees.push_back(Employee {.id = getUuid(), .firstName = firstName, .lastName = lastName, .regRate = regRate});
+// Gets the option selected by the user, from the menu's options
+char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
+    char selection = 'A';
+    bool isInvalidAnswer;
+    vector<char> allowedAnswers {'A', 'X'};
+    const vector<char> ifHasEmployeesAnswers {'B'};
+    const vector<char> ifHasPaymentsAnswers {'C', 'D'};
+    if (hasEmployees) allowedAnswers.insert(allowedAnswers.end(), ifHasEmployeesAnswers.begin(), ifHasEmployeesAnswers.end());
+    if (hasPayments) allowedAnswers.insert(allowedAnswers.end(), ifHasPaymentsAnswers.begin(), ifHasPaymentsAnswers.end());
+
+    do {
+        selection = toupper(getAlphaChar("Type your selection please"));
+
+        isInvalidAnswer = !isValidMenuSelection(selection, allowedAnswers);
+        if (isInvalidAnswer) {
+            cout << "The only allowed answers are: " << endl;
+            const size_t size = allowedAnswers.size();
+            for (int i = 0; i < size; i++) {
+                std::cout << allowedAnswers[i];
+                std::cout << (i == size - 2 ? ", or " : ", ");
+            }
+            std::cout << ". Try again." << endl;
+        }
+    } while (isInvalidAnswer);
+
+    return selection;
 }
 
-// Adds a Payment structure variable, associated to a specific Employee, to the reference of a given vector of Payments
-void addPayment(vector<Payment> &payments, const vector<Employee> &employees) {
-    // First we show the employee's table to the user, so that the user can decide which employee to associate the new payment with
-    showEmployeesTable(employees);
-}
-
-
-void renderLineUnderTableRow(const int largestFullNameLength) {
-    cout << "-----------------------------------------";
-    printNTimes("-", largestFullNameLength);
-    cout << "--" << endl;
+// Processes the selection made by the user from the menu
+void processMenuSelection(const char menuSelection, vector<Employee> &employees, vector<Payment> &payments) {
+    switch (menuSelection) {
+        case 'A':
+            addEmployee(employees);
+            break;
+        case 'B':
+            addPayment(payments, employees);
+            break;
+        case 'C':
+            printCurrentEmployeePayrollReport(payments, employees);
+            break;
+        case 'D':
+            printCompanyPayrollReport(payments);
+            break;
+        default: ;
+    }
 }
 
 void showEmployeesTable(const vector<Employee> &employees) {
@@ -1090,6 +1131,44 @@ void showEmployeesTable(const vector<Employee> &employees) {
     }
 }
 
+// Prints an appropiate length "line" conformed by dashes, as part of a good looking table
+void renderLineUnderTableRow(const int largestFullNameLength) {
+    cout << "-----------------------------------------";
+    printNTimes("-", largestFullNameLength);
+    cout << "--" << endl;
+}
+
+// Adds an Employee structure variable to the reference of a given vector of Employees
+void addEmployee(vector<Employee> &employees) {
+    cout << endl;
+    const string firstName = getStringFromMessage("Please type the first name of the new Employee: ");
+    const string lastName = getStringFromMessage("Please type the last name of the new Employee: ");
+    const double regRate = getDouble("Please type the regular payment rate of the new Employee", MIN_HOURLY_RATE, MAX_HOURLY_RATE, true);
+    employees.push_back(Employee {.id = getUuid(), .firstName = firstName, .lastName = lastName, .regRate = regRate});
+}
+
+// Adds a Payment structure variable, associated to a specific Employee, to the reference of a given vector of Payments
+void addPayment(vector<Payment> &payments, const vector<Employee> &employees) {
+    string employeeId;
+    bool theEmployeeDoNotExist = true;
+
+    // First we show the employee's table to the user, so that the user can decide which employee to associate the new payment with
+    showEmployeesTable(employees);
+
+    do {
+        employeeId = getStringFromMessage("And now I need you to either type or copy/paste the id of the employee to whom you are going to associate the payment: ");
+        theEmployeeDoNotExist = !existEmployee(employees, employeeId);
+        if (theEmployeeDoNotExist)
+            cout << "We don't have an Employee with such ID. Try again please." << endl;
+    } while (theEmployeeDoNotExist);
+
+    // Once we know that an Employee exist with such id, then we can safely retrieve it
+    const Employee theEmployee = getEmployeById(employees, employeeId);
+
+    // And then we can also safely associate the payment to the retrieved employee
+    addPaymentToEmployee(payments, theEmployee);
+}
+
 // Adds an Employe's Payment structure variable to the reference of a given vector of Payments
 void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
     cout << endl;
@@ -1098,59 +1177,102 @@ void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
     payments.push_back(Payment {.employeeId = employee.id, .regHours = regHours, .otHours = otHours, .regRate = employee.regRate});
 }
 
-// Processes the selection made by the user from the menu
-void processMenuSelection(const char menuSelection, vector<Employee> &employees, vector<Payment> &payments) {
-    switch (menuSelection) {
-        case 'A':
-            addEmployee(employees);
-            break;
-        case 'B':
-            addPayment(payments, employees);
-            break;
-        case 'C':
-            printEmployeePayrollReport(payments, employees);
-            break;
-        case 'D':
-            printCompanyPayrollReport(payments);
-            break;
-        default: ;
-    }
-}
-
-// Gets the option selected by the user, from the menu's options
-char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
-    char selection = 'A';
-    bool isInvalidAnswer;
-    vector<char> allowedAnswers {'A', 'X'};
-    const vector<char> ifHasEmployeesAnswers {'B'};
-    const vector<char> ifHasPaymentsAnswers {'C', 'D'};
-    if (hasEmployees) allowedAnswers.insert(allowedAnswers.end(), ifHasEmployeesAnswers.begin(), ifHasEmployeesAnswers.end());
-    if (hasPayments) allowedAnswers.insert(allowedAnswers.end(), ifHasPaymentsAnswers.begin(), ifHasPaymentsAnswers.end());
-
-    do {
-        selection = toupper(getAlphaChar("Type your selection please"));
-
-        isInvalidAnswer = !isValidAnswer(selection, allowedAnswers);
-        if (isInvalidAnswer) {
-            cout << "The only allowed answers are: " << endl;
-            const size_t size = allowedAnswers.size();
-            for (int i = 0; i < size; i++) {
-                std::cout << allowedAnswers[i];
-                std::cout << (i == size - 2 ? ", or " : ", ");
-            }
-            std::cout << ". Try again." << endl;
-        }
-    } while (isInvalidAnswer);
-
-    return selection;
-}
-
 // Prints on the terminal a PayrollReport for a specific Employee
-void printEmployeePayrollReport(vector<Payment> &payments, const vector<Employee> &employees) {
+void printCurrentEmployeePayrollReport(vector<Payment> &payments, const vector<Employee> &employees) {
+    string employeeId;
+    bool theEmployeeDoNotExist = true;
+    bool theEmployeeHasPayments = true;
+
     // First we show the employee's table to the user, so that the user can decide for which employee he wants to print the Payment Report
     showEmployeesTable(employees);
+
+    do {
+        employeeId = getStringFromMessage("And now I need you to either type or copy/paste the id of the employee for whom you want to print the Payroll Report: ");
+        theEmployeeDoNotExist = !existEmployee(employees, employeeId);
+        if (theEmployeeDoNotExist)
+            cout << "We don't have an Employee with such ID. Try again please." << endl;
+    } while (theEmployeeDoNotExist); // We are not leaving until we get an existing employee's id
+
+    // Ok, but now we also need to know if besides existing, the employee has associated payments too
+    theEmployeeHasPayments = theEmployeeHasPayments(payments, employeeId);
+
+    if (theEmployeeHasPayments) {
+        // Once we know that the Employee has at least an associated Payment, we can safely generate its pertinent addition & average EmployeePayrollReport
+        EmployeePayrollReport additionEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employeeId);
+        EmployeePayrollReport averageEmployeePayrollReport = createAverageEmployeePayrollReport(payments, employeeId);
+
+        // And now we can finally send both to print
+    } else {
+        cout << "The selected employee do not have associated any payment. Good bye." << endl;
+    }
 }
 
 // Prints on the terminal a PayrollReport for the whole company
 void printCompanyPayrollReport(vector<Payment> &payments) {
+}
+
+// Determines if a given emloyeeID belongs to the current ones
+bool existEmployee(const vector<Employee> &employees, const string &employeeId) {
+    return any_of(employees.begin(), employees.end(), [&](const Employee &emp) { return emp.id == employeeId; });
+}
+
+// Determines if a given emloyee's id has associated at least one payment
+bool employeeHasPayments(const vector<Payment> &payments, const string &employeeId) {
+    return any_of(payments.begin(), payments.end(), [&](const Payment &payment) { return payment.employeeId == employeeId; });
+}
+
+// Retrieves an Employee structure variable by a given employee's id
+Employee getEmployeById(const vector<Employee> &employees, const string &employeeId) {
+    // We could define it as auto too, but it's ok
+    // __wrap_iter<const Employee *> employeeFirstIterator = find_if( //find() ask for a value, use find_if() for condition
+    //     employees.begin(),
+    //     employees.end(),
+    //     [&](const Employee &emp) //you want to compare an item
+    //     {
+    //         return emp.id == employeeId;
+    //     }
+    // );
+    // Employee employee = *employeeFirstIterator;
+
+    //find() ask for a value, and we use find_if() for a condition instead
+    // Let's just return it directly instead
+    return *find_if(employees.begin(), employees.end(), [&](const Employee &emp) { return emp.id == employeeId; });
+}
+
+// Generates a EmployeePayrollReport with the addition of all the Payment structure variables related to a given employee's id
+EmployeePayrollReport createAdditionEmployeePayrollReport(vector<Payment> &payments, const string &employeeId) {
+    EmployeePayrollReport theAdditionEmployeePayrollReport {.employeeId = employeeId};
+
+    // So now we can increase each respective field, to leave it as an addition PayrollReport
+    for (const Payment &payment: payments) {
+        if (payment.employeeId == employeeId) {
+            theAdditionEmployeePayrollReport.regHours += payment.regHours;
+            theAdditionEmployeePayrollReport.otHours += payment.otHours;
+            theAdditionEmployeePayrollReport.regPay += payment.regPay();
+            theAdditionEmployeePayrollReport.otPay += payment.otPay();
+            theAdditionEmployeePayrollReport.fica += payment.fica();
+            theAdditionEmployeePayrollReport.socSec += payment.socSec();
+        }
+    }
+
+    return theAdditionEmployeePayrollReport;
+}
+
+// Generates a EmployeePayrollReport with the average of all the Payment structure variables related to a given employee's id
+EmployeePayrollReport createAverageEmployeePayrollReport(vector<Payment> &payments, const string &employeeId) {
+    // First we get a good old fashion & regular PaymentReport based on the given employeeId
+    EmployeePayrollReport theAverageEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employeeId);
+
+    // And now we must count how many payments has associated the employee to whom belongs the given id, so we can average his payment stats right after that
+    const int empoloyeePaymentsAmount = count_if(payments.begin(), payments.end(), [&](const Payment &payment) { return payment.employeeId == employeeId; });
+
+    // So now we can average/update each field, to leave it as an average PayrollReport
+    theAverageEmployeePayrollReport.regHours /= empoloyeePaymentsAmount;
+    theAverageEmployeePayrollReport.otHours /= empoloyeePaymentsAmount;
+    theAverageEmployeePayrollReport.regPay /= empoloyeePaymentsAmount;
+    theAverageEmployeePayrollReport.otPay /= empoloyeePaymentsAmount;
+    theAverageEmployeePayrollReport.fica /= empoloyeePaymentsAmount;
+    theAverageEmployeePayrollReport.socSec /= empoloyeePaymentsAmount;
+
+    return theAverageEmployeePayrollReport;
 }
