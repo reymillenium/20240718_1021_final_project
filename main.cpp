@@ -285,6 +285,7 @@ struct PayrollReport {
     [[nodiscard]] double netPay() const { return totalPay() - totDeductions(); }
 };
 
+// Logical Interpretation: An EmployeePayrollReport is a PayrollReport, plus adding an employee's id
 struct EmployeePayrollReport : PayrollReport {
     string employeeId;
 
@@ -328,10 +329,10 @@ void addPaymentToEmployee(vector<Payment> &, const Employee &);
 char getMenuSelection(bool, bool);
 
 // Prints on the terminal a PayrollReport for a specific Employee
-void printCurrentEmployeePayrollReports(vector<Payment> &, const vector<Employee> &);
+void generateAndPrintCurrentEmployeePayrollReports(vector<Payment> &, const vector<Employee> &);
 
 // Prints on the terminal both PayrollReports, addition & average, for the whole company
-void printCompanyPayrollReport(vector<Payment> &);
+void generateAndPrintCompanyPayrollReports(const vector<Payment> &);
 
 // Determines if a given emloyeeID belongs to the current ones
 bool existEmployee(const vector<Employee> &, const string &);
@@ -343,7 +344,7 @@ bool employeeHasPayments(const vector<Payment> &, const string &);
 Employee getEmployeById(const vector<Employee> &, const string &);
 
 // Generates a EmployeePayrollReport with the addition of all the Payment structure variables related to a given employee's id
-EmployeePayrollReport createAdditionEmployeePayrollReport(vector<Payment> &, const string &);
+EmployeePayrollReport createAdditionEmployeePayrollReport(const vector<Payment> &, const string &);
 
 // Generates a PayrollReport with the addition of all the Payment structure variables's data of the whole company across the time
 PayrollReport createAdditionPayrollReport(const vector<Payment> &);
@@ -1126,10 +1127,10 @@ void processMenuSelection(const char menuSelection, vector<Employee> &employees,
             addPayment(payments, employees);
             break;
         case 'C':
-            printCurrentEmployeePayrollReports(payments, employees);
+            generateAndPrintCurrentEmployeePayrollReports(payments, employees);
             break;
         case 'D':
-            printCompanyPayrollReport(payments);
+            generateAndPrintCompanyPayrollReports(payments);
             break;
         default: ;
     }
@@ -1211,7 +1212,7 @@ void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
 }
 
 // Prints on the terminal a PayrollReport for a specific Employee
-void printCurrentEmployeePayrollReports(vector<Payment> &payments, const vector<Employee> &employees) {
+void generateAndPrintCurrentEmployeePayrollReports(vector<Payment> &payments, const vector<Employee> &employees) {
     string employeeId;
     bool theEmployeeDoNotExist = true;
     bool theEmployeeHasPayments = true;
@@ -1235,8 +1236,8 @@ void printCurrentEmployeePayrollReports(vector<Payment> &payments, const vector<
         const Employee employee = getEmployeById(employees, employeeId);
 
         // Once we know that the Employee has at least an associated Payment, we can safely generate its pertinent addition & average EmployeePayrollReport
-        EmployeePayrollReport additionEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employeeId);
-        EmployeePayrollReport averageEmployeePayrollReport = createAverageEmployeePayrollReport(payments, employeeId);
+        const EmployeePayrollReport additionEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employeeId);
+        const EmployeePayrollReport averageEmployeePayrollReport = createAverageEmployeePayrollReport(payments, employeeId);
 
         // And now we can finally send both to print
         printEmployeePayrollReports(additionEmployeePayrollReport, averageEmployeePayrollReport, employee);
@@ -1246,13 +1247,13 @@ void printCurrentEmployeePayrollReports(vector<Payment> &payments, const vector<
 }
 
 // Prints on the terminal both PayrollReports, addition & average, for the whole company
-void printCompanyPayrollReport(vector<Payment> &payments) {
+void generateAndPrintCompanyPayrollReports(const vector<Payment> &payments) {
     // First we must generate the company's addition & average PayrollReports
-    PayrollReport additionPayrollReport = createAdditionPayrollReport(payments);
-    PayrollReport averagePayrollReport = createAveragePayrollReport(payments);
+    const PayrollReport additionPayrollReport = createAdditionPayrollReport(payments);
+    const PayrollReport averagePayrollReport = createAveragePayrollReport(payments);
 
     // And now we can finally send both to print
-    // printPayrollReports(additionPayrollReport, averagePayrollReport);
+    printCompanyPayrollReports(additionPayrollReport, averagePayrollReport);
 }
 
 // Determines if a given emloyeeID belongs to the current ones
@@ -1346,7 +1347,7 @@ PayrollReport createAveragePayrollReport(const vector<Payment> &payments) {
     PayrollReport anAdditionPayrollReport = createAdditionPayrollReport(payments);
 
     // And now we must count how many payments exist, so we can average the PayrollReport's stats right after that
-    const int companyPaymentsAmount = payments.size(); // It's way simpler & faster this way
+    const int companyPaymentsAmount = static_cast<int>(payments.size()); // It's way simpler & faster this way. Also casting from size_t to int to avoid an annoying warning
 
     // So now we can average/update each field, to leave it as an average PayrollReport
     anAdditionPayrollReport.regHours /= companyPaymentsAmount;
@@ -1361,6 +1362,8 @@ PayrollReport createAveragePayrollReport(const vector<Payment> &payments) {
 
 // Prints on the console both, the addition & average PayrollReports of the company
 void printCompanyPayrollReports(const PayrollReport &additionPR, const PayrollReport &averagePR) {
+    cout << endl;
+    cout << "The company has made " << additionPR.paymentsAmount << " payments." << endl;
     printPayrollReportsTable(additionPR, averagePR);
 }
 
