@@ -54,7 +54,7 @@ void printLine(const T &);
 
 // Prints a given value, of almost any kind, N given times in the terminal, and then breaks the line
 template<typename T>
-void prinLineNTimes(const T &, int);
+void printLineNTimes(const T &, int);
 
 // Gets several types of values from the console (except strings with spaces, objects, etc, among others), as a response of a given question
 template<typename T>
@@ -265,6 +265,7 @@ struct Payment {
 };
 
 struct PayrollReport {
+    int paymentsAmount {0};
     double regHours {0.0};
     double otHours {0.0};
     double regPay {0.0};
@@ -322,7 +323,7 @@ void addPaymentToEmployee(vector<Payment> &, const Employee &);
 char getMenuSelection(bool, bool);
 
 // Prints on the terminal a PayrollReport for a specific Employee
-void printCurrentEmployeePayrollReport(vector<Payment> &, const vector<Employee> &);
+void printCurrentEmployeePayrollReports(vector<Payment> &, const vector<Employee> &);
 
 // Prints on the terminal a PayrollReport for the whole company
 void printCompanyPayrollReport(vector<Payment> &);
@@ -341,6 +342,16 @@ EmployeePayrollReport createAdditionEmployeePayrollReport(vector<Payment> &, con
 
 // Generates a EmployeePayrollReport with the average of all the Payment structure variables related to a given employee's id
 EmployeePayrollReport createAverageEmployeePayrollReport(vector<Payment> &, const string &);
+
+// Pints on the console both, the addition & average PayrollReports of the company
+void printCompanyPayrollReports(const PayrollReport &, const PayrollReport &);
+
+// Prints on the console both, the addition & average given EmployeePayrollReports
+void printEmployeePayrollReports(const EmployeePayrollReport &, const EmployeePayrollReport &, const Employee &);
+
+// Prints either a EmployeePayrollReport or a PayrollReport structure variable, with addition and average data,
+// as we pass as argument a father struct PayrollReport variable, and from the received parameter we won't use the employee's id anyway at this point (either done before or not needed)
+void printPayrollReportsTable(const PayrollReport &, const PayrollReport &);
 
 int main() {
     vector<Employee> employees; // Our current employees
@@ -396,7 +407,7 @@ void printLine(const T &item) {
 
 // Prints a given value, of almost any kind, N given times in the terminal, and then breaks the line
 template<typename T>
-void prinLineNTimes(const T &item, const int times) {
+void printLineNTimes(const T &item, const int times) {
     for (int i = 0; i < times; i += 1) {
         printl(item);
     }
@@ -1094,7 +1105,7 @@ void processMenuSelection(const char menuSelection, vector<Employee> &employees,
             addPayment(payments, employees);
             break;
         case 'C':
-            printCurrentEmployeePayrollReport(payments, employees);
+            printCurrentEmployeePayrollReports(payments, employees);
             break;
         case 'D':
             printCompanyPayrollReport(payments);
@@ -1178,7 +1189,7 @@ void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
 }
 
 // Prints on the terminal a PayrollReport for a specific Employee
-void printCurrentEmployeePayrollReport(vector<Payment> &payments, const vector<Employee> &employees) {
+void printCurrentEmployeePayrollReports(vector<Payment> &payments, const vector<Employee> &employees) {
     string employeeId;
     bool theEmployeeDoNotExist = true;
     bool theEmployeeHasPayments = true;
@@ -1197,11 +1208,15 @@ void printCurrentEmployeePayrollReport(vector<Payment> &payments, const vector<E
     theEmployeeHasPayments = theEmployeeHasPayments(payments, employeeId);
 
     if (theEmployeeHasPayments) {
+        // Next we retrieve the Employee, for future printing purposes, as the future table will look way better with that useful extra data
+        const Employee employee = getEmployeById(employees, employeeId);
+
         // Once we know that the Employee has at least an associated Payment, we can safely generate its pertinent addition & average EmployeePayrollReport
         EmployeePayrollReport additionEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employeeId);
         EmployeePayrollReport averageEmployeePayrollReport = createAverageEmployeePayrollReport(payments, employeeId);
 
         // And now we can finally send both to print
+        printEmployeePayrollReports(additionEmployeePayrollReport, averageEmployeePayrollReport, employee);
     } else {
         cout << "The selected employee do not have associated any payment. Good bye." << endl;
     }
@@ -1246,6 +1261,7 @@ EmployeePayrollReport createAdditionEmployeePayrollReport(vector<Payment> &payme
     // So now we can increase each respective field, to leave it as an addition PayrollReport
     for (const Payment &payment: payments) {
         if (payment.employeeId == employeeId) {
+            theAdditionEmployeePayrollReport.paymentsAmount++;
             theAdditionEmployeePayrollReport.regHours += payment.regHours;
             theAdditionEmployeePayrollReport.otHours += payment.otHours;
             theAdditionEmployeePayrollReport.regPay += payment.regPay();
@@ -1261,18 +1277,59 @@ EmployeePayrollReport createAdditionEmployeePayrollReport(vector<Payment> &payme
 // Generates a EmployeePayrollReport with the average of all the Payment structure variables related to a given employee's id
 EmployeePayrollReport createAverageEmployeePayrollReport(vector<Payment> &payments, const string &employeeId) {
     // First we get a good old fashion & regular PaymentReport based on the given employeeId
-    EmployeePayrollReport theAverageEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employeeId);
+    EmployeePayrollReport theAdditionEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employeeId);
 
     // And now we must count how many payments has associated the employee to whom belongs the given id, so we can average his payment stats right after that
-    const int empoloyeePaymentsAmount = count_if(payments.begin(), payments.end(), [&](const Payment &payment) { return payment.employeeId == employeeId; });
+    // const int empoloyeePaymentsAmount = count_if(payments.begin(), payments.end(), [&](const Payment &payment) { return payment.employeeId == employeeId; });
+    const int employeePaymentsAmount = theAdditionEmployeePayrollReport.paymentsAmount;
 
     // So now we can average/update each field, to leave it as an average PayrollReport
-    theAverageEmployeePayrollReport.regHours /= empoloyeePaymentsAmount;
-    theAverageEmployeePayrollReport.otHours /= empoloyeePaymentsAmount;
-    theAverageEmployeePayrollReport.regPay /= empoloyeePaymentsAmount;
-    theAverageEmployeePayrollReport.otPay /= empoloyeePaymentsAmount;
-    theAverageEmployeePayrollReport.fica /= empoloyeePaymentsAmount;
-    theAverageEmployeePayrollReport.socSec /= empoloyeePaymentsAmount;
+    theAdditionEmployeePayrollReport.paymentsAmount = employeePaymentsAmount;
+    theAdditionEmployeePayrollReport.regHours /= employeePaymentsAmount;
+    theAdditionEmployeePayrollReport.otHours /= employeePaymentsAmount;
+    theAdditionEmployeePayrollReport.regPay /= employeePaymentsAmount;
+    theAdditionEmployeePayrollReport.otPay /= employeePaymentsAmount;
+    theAdditionEmployeePayrollReport.fica /= employeePaymentsAmount;
+    theAdditionEmployeePayrollReport.socSec /= employeePaymentsAmount;
 
-    return theAverageEmployeePayrollReport;
+    return theAdditionEmployeePayrollReport;
+}
+
+// Pints on the console both, the addition & average PayrollReports of the company
+void printCompanyPayrollReports(const PayrollReport &additionPR, const PayrollReport &averagePR) {
+}
+
+// Prints on the console both, the addition & average given EmployeePayrollReports
+void printEmployeePayrollReports(const EmployeePayrollReport &additionEPR, const EmployeePayrollReport &averageEPR, const Employee &employee) {
+    cout << endl;
+    cout << "The employee " << employee.fullName() << ", with id " << employee.id << " has associated " << additionEPR.paymentsAmount << " payments." << endl;
+    printPayrollReportsTable(additionEPR, averageEPR);
+}
+
+// Prints either a EmployeePayrollReport or a PayrollReport structure variable, with addition and average data,
+// as we pass as argument a father struct PayrollReport variable, and from the received parameter we won't use the employee's id anyway at this point (either done before or not needed)
+void printPayrollReportsTable(const PayrollReport &additionPR, const PayrollReport &averagePR) {
+    constexpr int MAX_AMOUNT_DASHES = 48;
+
+    printLineNTimes("-", MAX_AMOUNT_DASHES);
+    cout << "|       Field       |   Addition   |   Average   |" << endl;
+    printLineNTimes("-", MAX_AMOUNT_DASHES);
+    cout << "|  Regular Hours    | " << setw(12) << left << additionPR.regHours << " | " << setw(11) << left << averagePR.regHours << " |" << endl;
+    printLineNTimes("-", MAX_AMOUNT_DASHES);
+    cout << "|  Overtime Hours   | " << setw(12) << left << additionPR.otHours << " | " << setw(11) << left << averagePR.otHours << " |" << endl;
+    printLineNTimes("-", MAX_AMOUNT_DASHES);
+    cout << "|  Regular Pay      | " << setw(12) << left << additionPR.regPay << " | " << setw(11) << left << averagePR.regPay << " |" << endl;
+    printLineNTimes("-", MAX_AMOUNT_DASHES);
+    cout << "|  Overtime Pay     | " << setw(12) << left << additionPR.otPay << " | " << setw(11) << left << averagePR.otPay << " |" << endl;
+    printLineNTimes("-", MAX_AMOUNT_DASHES);
+    cout << "|       FICA        | " << setw(12) << left << additionPR.fica << " | " << setw(11) << left << averagePR.fica << " |" << endl;
+    printLineNTimes("-", MAX_AMOUNT_DASHES);
+    cout << "|  Social Security  | " << setw(12) << left << additionPR.socSec << " | " << setw(11) << left << averagePR.socSec << " |" << endl;
+    printLineNTimes("-", MAX_AMOUNT_DASHES);
+    cout << "|     Total Pay     | " << setw(12) << left << additionPR.totalPay() << " | " << setw(11) << left << averagePR.totalPay() << " |" << endl;
+    printLineNTimes("-", MAX_AMOUNT_DASHES);
+    cout << "|  Total Deductions | " << setw(12) << left << additionPR.totDeductions() << " | " << setw(11) << left << averagePR.totDeductions() << " |" << endl;
+    printLineNTimes("-", MAX_AMOUNT_DASHES);
+    cout << "|      Net Pay      | " << setw(12) << left << additionPR.netPay() << " | " << setw(11) << left << averagePR.netPay() << " |" << endl;
+    printLineNTimes("-", MAX_AMOUNT_DASHES);
 }
