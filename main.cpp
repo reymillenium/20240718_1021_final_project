@@ -47,7 +47,6 @@ using namespace std;
 
 constexpr int MAX_REG_HOURS = 40;
 constexpr int MAX_HOURS_WORKED = 50;
-// constexpr int MAX_OT_HOURS = MAX_HOURS_WORKED - MAX_REG_HOURS;
 constexpr double MIN_HOURLY_WAGE = 10.00;
 constexpr double MAX_HOURLY_WAGE = 30.00;
 constexpr double FICA_RATE = .20;
@@ -304,18 +303,18 @@ struct Payment {
     string firstName;
     string lastName;
 
-    double regHours {0.0};
-    double otHours {0.0};
+    double hoursWorked {0.0};
     double regRate {0.0};
 
     Payment() = default;
 
     [[nodiscard]] string fullName() const { return firstName + " " + lastName; }
 
-    [[nodiscard]] double hoursWorked() const { return regHours + otHours; }
+    [[nodiscard]] double regHours() const { return (hoursWorked <= MAX_REG_HOURS ? hoursWorked : MAX_REG_HOURS); }
+    [[nodiscard]] double otHours() const { return (hoursWorked <= MAX_REG_HOURS ? 0 : hoursWorked - MAX_REG_HOURS); }
     [[nodiscard]] double otRate() const { return regRate * OT_MULT; }
-    [[nodiscard]] double regPay() const { return regHours * regRate; }
-    [[nodiscard]] double otPay() const { return otHours * otRate(); }
+    [[nodiscard]] double regPay() const { return regHours() * regRate; }
+    [[nodiscard]] double otPay() const { return otHours() * otRate(); }
     [[nodiscard]] double totalPay() const { return regPay() + otPay(); }
     [[nodiscard]] double fica() const { return totalPay() * FICA_RATE; }
     [[nodiscard]] double socSec() const { return totalPay() * SS_MED_RATE; }
@@ -1405,13 +1404,9 @@ void addPayment(vector<Payment> &payments, const vector<Employee> &employees) {
 
 // Adds an Employe's Payment structure variable to the reference of a given vector of Payments
 void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
-    double otHours {0};
-
     cout << endl;
-    const double regHours = getDouble("Please type how many regular hours the Employee worked", 1, MAX_REG_HOURS, true);;
-    if (MAX_REG_HOURS <= regHours && regHours < MAX_HOURS_WORKED) // There is no point in asking for overtime if the employee dont even have the 40 weekly hours or if he already worked the legal maximum of 50
-        otHours = getDouble("Please type how many overtime hours the Employee worked", 1, MAX_HOURS_WORKED - regHours, true);
-    payments.push_back(Payment {.employeeId = employee.id, .firstName = employee.firstName, .lastName = employee.lastName, .regHours = regHours, .otHours = otHours, .regRate = employee.regRate});
+    const double hoursWorked = getDouble("Please type how many hours the Employee worked in total on the billing cycle", 1, MAX_HOURS_WORKED, true);;
+    payments.push_back(Payment {.employeeId = employee.id, .firstName = employee.firstName, .lastName = employee.lastName, .hoursWorked = hoursWorked, .regRate = employee.regRate});
 }
 
 // prints on the terminal all the payments made by the company, including those to ex employees
@@ -1448,7 +1443,7 @@ void printPayments(const vector<Payment> &payments) {
     // Each one of the rows
     for (const Payment &payment: payments) {
         cout << "| " << right << setw(largestFullNameLength) << setfill(' ') << left << payment.fullName() << " | " << right << setw(10) << payment.hoursWorked() << " | ";
-        cout << setw(7) << payment.regHours << " | " << setw(8) << monetizeDouble(payment.regRate) << " | " << setw(6) << payment.otHours << " | " << setw(7) << monetizeDouble(payment.otRate()) << " | ";
+        cout << setw(7) << payment.regHours() << " | " << setw(8) << monetizeDouble(payment.regRate) << " | " << setw(6) << payment.otHours() << " | " << setw(7) << monetizeDouble(payment.otRate()) << " | ";
         cout << setw(12) << monetizeDouble(payment.regPay()) << " | " << setw(12) << monetizeDouble(payment.otPay()) << " | " << setw(12) << monetizeDouble(payment.totalPay()) << " | ";
         cout << setw(12) << monetizeDouble(payment.fica()) << " | " << setw(12) << monetizeDouble(payment.socSec()) << " | " << setw(12) << monetizeDouble(payment.totDeductions()) << " | ";
         cout << setw(12) << monetizeDouble(payment.netPay()) << " |" << endl;
@@ -1542,8 +1537,8 @@ EmployeePayrollReport createAdditionEmployeePayrollReport(const vector<Payment> 
     for (const Payment &payment: payments) {
         if (payment.employeeId == employee.id) {
             theAdditionEmployeePayrollReport.paymentsAmount++;
-            theAdditionEmployeePayrollReport.regHours += payment.regHours;
-            theAdditionEmployeePayrollReport.otHours += payment.otHours;
+            theAdditionEmployeePayrollReport.regHours += payment.regHours();
+            theAdditionEmployeePayrollReport.otHours += payment.otHours();
             theAdditionEmployeePayrollReport.regPay += payment.regPay();
             theAdditionEmployeePayrollReport.otPay += payment.otPay();
             theAdditionEmployeePayrollReport.fica += payment.fica();
@@ -1561,8 +1556,8 @@ PayrollReport createAdditionPayrollReport(const vector<Payment> &payments) {
     // And then we increase each respective field, to leave it as an Addition PayrollReport
     for (const Payment &payment: payments) {
         anAdditionPayrollReport.paymentsAmount++;
-        anAdditionPayrollReport.regHours += payment.regHours;
-        anAdditionPayrollReport.otHours += payment.otHours;
+        anAdditionPayrollReport.regHours += payment.regHours();
+        anAdditionPayrollReport.otHours += payment.otHours();
         anAdditionPayrollReport.regPay += payment.regPay();
         anAdditionPayrollReport.otPay += payment.otPay();
         anAdditionPayrollReport.fica += payment.fica();
