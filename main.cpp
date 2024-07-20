@@ -1411,7 +1411,7 @@ void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
     const double regHours = getDouble("Please type how many regular hours the Employee worked", 1, MAX_REG_HOURS, true);;
     if (MAX_REG_HOURS <= regHours && regHours < MAX_HOURS_WORKED) // There is no point in asking for overtime if the employee dont even have the 40 weekly hours or if he already worked the legal maximum of 50
         otHours = getDouble("Please type how many overtime hours the Employee worked", 1, MAX_HOURS_WORKED - regHours, true);
-    payments.push_back(Payment {.employeeId = employee.id, .firstName = employee.lastName, .lastName = employee.lastName, .regHours = regHours, .otHours = otHours, .regRate = employee.regRate});
+    payments.push_back(Payment {.employeeId = employee.id, .firstName = employee.firstName, .lastName = employee.lastName, .regHours = regHours, .otHours = otHours, .regRate = employee.regRate});
 }
 
 // prints on the terminal all the payments made by the company, including those to ex employees
@@ -1427,9 +1427,8 @@ void printAllThePayments(const vector<Payment> &payments) {
 
 // Prints an appropiate length "line" conformed by dashes, as part of a good looking Payments table
 void renderLineUnderPaymentsTableRow(const int largestFullNameLength) {
-    cout << "-----------------------------------------";
     printNTimes("-", largestFullNameLength);
-    cout << "--" << endl;
+    printNTimesAndBreak("-", 162);
 }
 
 // Prints on the terminal a given vector of Payment structure variables
@@ -1439,36 +1438,20 @@ void printPayments(const vector<Payment> &payments) {
 
     cout << endl;
 
-    // double regHours {0.0};
-    // double otHours {0.0};
-    // double regRate {0.0};
-    //
-    // [[nodiscard]] string fullName() const { return firstName + " " + lastName; }
-    //
-    // [[nodiscard]] double hoursWorked() const { return regHours + otHours; }
-    // [[nodiscard]] double otRate() const { return regRate * OT_MULT; }
-    // [[nodiscard]] double regPay() const { return regHours * regRate; }
-    // [[nodiscard]] double otPay() const { return otHours * otRate(); }
-    // [[nodiscard]] double totalPay() const { return regPay() + otPay(); }
-    // [[nodiscard]] double fica() const { return totalPay() * FICA_RATE; }
-    // [[nodiscard]] double socSec() const { return totalPay() * SS_MED_RATE; }
-    // [[nodiscard]] double totDeductions() const { return fica() + socSec(); }
-    // [[nodiscard]] double netPay() const { return totalPay() - totDeductions(); }
-
     // Table Header
     renderLineUnderPaymentsTableRow(largestFullNameLength);
-    cout << "|                Unique ID             | Full Name ";
+    cout << "| Full Name ";
     printNTimes(" ", largestFullNameLength - 10);
-    cout << " | Hours Worked | Regular Hours | Regular Rate | Overtime Hours | Overtime Rate | Regular Pay | Overtime Pay | Total Pay |   FICA   | Soc. Security | Total Deductions |   Net Pay   |" << endl;
+    cout << " | Hrs Worked | Reg Hrs | Reg Rate | OT Hrs | OT Rate |    Reg Pay   |    OT Pay    |  Total Pay   |     FICA     | Soc Security | Total Deduc. |    Net Pay   |" << endl;
     renderLineUnderPaymentsTableRow(largestFullNameLength);
 
     // Each one of the rows
     for (const Payment &payment: payments) {
-        cout << "| " << payment.employeeId << " | " << setw(largestFullNameLength) << setfill(' ') << left << payment.fullName() << " | " << setw(12) << payment.hoursWorked() << " | ";
-        cout << setw(13) << payment.regHours << " | " << setw(12) << monetizeDouble(payment.regRate) << " | " << setw(14) << payment.otHours << " | " << setw(13) << monetizeDouble(payment.otRate()) << " | ";
-        cout << setw(11) << monetizeDouble(payment.regPay()) << " | " << setw(12) << monetizeDouble(payment.otPay()) << " | " << setw(9) << monetizeDouble(payment.totalPay()) << " | ";
-        cout << setw(8) << monetizeDouble(payment.fica()) << " | " << setw(13) << monetizeDouble(payment.socSec()) << " | " << setw(16) << monetizeDouble(payment.totDeductions()) << " | ";
-        cout << setw(11) << monetizeDouble(payment.netPay()) << " |" << endl;
+        cout << "| " << right << setw(largestFullNameLength) << setfill(' ') << left << payment.fullName() << " | " << right << setw(10) << payment.hoursWorked() << " | ";
+        cout << setw(7) << payment.regHours << " | " << setw(8) << monetizeDouble(payment.regRate) << " | " << setw(6) << payment.otHours << " | " << setw(7) << monetizeDouble(payment.otRate()) << " | ";
+        cout << setw(12) << monetizeDouble(payment.regPay()) << " | " << setw(12) << monetizeDouble(payment.otPay()) << " | " << setw(12) << monetizeDouble(payment.totalPay()) << " | ";
+        cout << setw(12) << monetizeDouble(payment.fica()) << " | " << setw(12) << monetizeDouble(payment.socSec()) << " | " << setw(12) << monetizeDouble(payment.totDeductions()) << " | ";
+        cout << setw(12) << monetizeDouble(payment.netPay()) << " |" << endl;
         renderLineUnderPaymentsTableRow(largestFullNameLength);
     }
 }
