@@ -55,9 +55,10 @@ constexpr double SS_MED_RATE = .0765;
 constexpr double OT_MULT = 1.5;
 
 constexpr char ADD_EMPLOYEE_OPTION = 'A';
-constexpr char ADD_PAYMENT_OPTION = 'B';
-constexpr char GENERATE_AND_PRINT_CURRENT_EPR_OPTION = 'C';
-constexpr char GENERATE_AND_PRINT_COMPANY_PR_OPTION = 'D';
+constexpr char DELETE_EMPLOYEE_OPTION = 'B';
+constexpr char ADD_PAYMENT_OPTION = 'C';
+constexpr char GENERATE_AND_PRINT_CURRENT_EPR_OPTION = 'D';
+constexpr char GENERATE_AND_PRINT_COMPANY_PR_OPTION = 'E';
 constexpr char QUITTING_OPTION = 'X';
 
 
@@ -647,7 +648,7 @@ string humanizeDouble(const long double doubleValue, const int precision) {
 // Formats a given positive int by inserting a comma every 3 digits of its equivalent string, to make it more readable, by US standards
 string humanizeUnsignedInteger(const unsigned long long int integerValue) {
     string integerAsString = to_string(integerValue);
-    const int initialIndex = (integerAsString.length() - 3);
+    const int initialIndex = static_cast<int>(integerAsString.length() - 3);
     // We insert commas into the string every three digits, fromm right to left.
     for (int j = initialIndex; j > 0; j -= 3) {
         integerAsString.insert(j, ",");
@@ -1146,14 +1147,21 @@ void displayMenu(const bool hasEmployees, const bool hasPayments) {
     cout << "-----------------------------------------------------------------" << endl;
     cout << "                     P R O G R A M   M E N U                     " << endl;
     cout << "-----------------------------------------------------------------" << endl;
-    cout << "A - Input an Employee into the system." << endl;
-    if (hasEmployees)
-        cout << "B - Input a Payment for an existing Employee." << endl;
-    if (hasPayments) {
-        cout << "C - Print the Addition & Average Payroll Report for a current & specific employee." << endl;
-        cout << "D - Print the Addition & Average Payroll Report for all the company's employees." << endl;
+
+    cout << ADD_EMPLOYEE_OPTION << " - Input an Employee into the system." << endl;
+
+    if (hasEmployees) {
+        // cout << DELETE_EMPLOYEE_OPTION << " - Delete an Employee from our system." << endl;
+        cout << ADD_PAYMENT_OPTION << " - Input a Payment for an existing Employee." << endl;
     }
-    cout << "X - Exit the Program." << endl;
+
+    if (hasPayments) {
+        cout << GENERATE_AND_PRINT_CURRENT_EPR_OPTION << " - Print the Addition & Average Payroll Report only for a current & specific employee." << endl;
+        cout << GENERATE_AND_PRINT_COMPANY_PR_OPTION << " - Print the Addition & Average Payroll Report for all the company's employees." << endl;
+    }
+
+    cout << QUITTING_OPTION << " - Exit the Program." << endl;
+
     cout << endl;
 }
 
@@ -1179,11 +1187,11 @@ char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
 
         isInvalidAnswer = !isValidMenuSelection(selection, allowedMenuOptions);
         if (isInvalidAnswer) {
-            cout << "The only allowed answers are: " << endl;
+            cout << "The only available options are: " << endl;
             const size_t size = allowedMenuOptions.size();
             for (int i = 0; i < size; i++) {
                 std::cout << allowedMenuOptions[i];
-                std::cout << (i == size - 2 ? ", or " : ", ");
+                std::cout << (i == size - 2 ? ", or " : i == size - 1 ? "" : ", ");
             }
             std::cout << ". Try again." << endl;
         }
