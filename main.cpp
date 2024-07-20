@@ -409,6 +409,8 @@ void printEmployeePayrollReports(const EmployeePayrollReport &, const EmployeePa
 // as we pass as argument a father struct PayrollReport variable, and from the received parameter we won't use the employee's id anyway at this point (either done before or not needed)
 void printPayrollReportsTable(const PayrollReport &, const PayrollReport &);
 
+// Prints on the console goodbyes to the user
+void sayGoodbyeToTheUser();
 
 /**
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1143,7 +1145,6 @@ void showProgramWelcome() {
     cout << "*              Welcome to Payroll Pro 2.0                   *" << endl;
     cout << "*                                                           *" << endl;
     cout << "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" << endl;
-    // cout << "Welcome to Payroll Pro 2.0" << endl;
 }
 
 // Displays the menu to the user
@@ -1211,7 +1212,8 @@ void processMenuSelection(const char menuSelection, vector<Employee> &employees,
         case GENERATE_AND_PRINT_COMPANY_PR_OPTION:
             generateAndPrintCompanyPayrollReports(payments);
             break;
-        default: ;
+        default:
+            sayGoodbyeToTheUser();
     }
 }
 
@@ -1498,4 +1500,12 @@ void printPayrollReportsTable(const PayrollReport &additionPR, const PayrollRepo
     printNTimesAndBreak("-", MAX_ROW_WIDTH);
     cout << "|      Net Pay      | " << setw(ADDITION_COL_INNER_WIDTH) << left << monetizeDouble(additionPR.netPay()) << " | " << setw(AVERAGE_COL_INNER_WIDTH) << left << monetizeDouble(averagePR.netPay()) << " |" << endl;
     printNTimesAndBreak("-", MAX_ROW_WIDTH);
+}
+
+// Prints on the console goodbyes to the user
+void sayGoodbyeToTheUser() {
+    cout << endl;
+    cout << "Than you for using our services. " << endl;
+    cout << "Payroll Pro 20.0, Copyright © 2024 https://www.reiniergarcia.dev/" << endl;
+    cout << "Goodbye!" << endl;
 }
