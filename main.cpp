@@ -1366,18 +1366,7 @@ bool employeeHasPayments(const vector<Payment> &payments, const string &employee
 
 // Retrieves an Employee structure variable by a given employee's id
 Employee getEmployeById(const vector<Employee> &employees, const string &employeeId) {
-    // We could define it as auto too, but it's ok
-    // __wrap_iter<const Employee *> employeeFirstIterator = find_if( //find() ask for a value, use find_if() for condition
-    //     employees.begin(),
-    //     employees.end(),
-    //     [&](const Employee &emp) //you want to compare an item
-    //     {
-    //         return emp.id == employeeId;
-    //     }
-    // );
-    // Employee employee = *employeeFirstIterator;
-
-    // Let's just return it directly instead
+    // Let's just return it directly
     return *find_if(employees.begin(), employees.end(), [&](const Employee &emp) { return emp.id == employeeId; });
 }
 
