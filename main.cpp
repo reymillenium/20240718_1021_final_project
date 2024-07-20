@@ -1140,11 +1140,11 @@ string getUuid() {
 // Shows the program's welcoming message
 void showProgramWelcome() {
     cout << endl;
-    cout << "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" << endl;
-    cout << "*                                                           *" << endl;
-    cout << "*              Welcome to Payroll Pro 2.0                   *" << endl;
-    cout << "*                                                           *" << endl;
-    cout << "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" << endl;
+    cout << "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" << endl;
+    cout << "*                                                               *" << endl;
+    cout << "*                Welcome to Payroll Pro 2.0                     *" << endl;
+    cout << "*                                                               *" << endl;
+    cout << "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" << endl;
 }
 
 // Displays the menu to the user
