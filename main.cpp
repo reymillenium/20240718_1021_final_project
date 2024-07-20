@@ -1138,20 +1138,28 @@ string getUuid() {
 // Shows the program's welcoming message
 void showProgramWelcome() {
     cout << endl;
-    cout << "Welcome to Payroll Pro 2.0" << endl;
+    cout << "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" << endl;
+    cout << "*                                                           *" << endl;
+    cout << "*              Welcome to Payroll Pro 2.0                   *" << endl;
+    cout << "*                                                           *" << endl;
+    cout << "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" << endl;
+    // cout << "Welcome to Payroll Pro 2.0" << endl;
 }
 
 // Displays the menu to the user
 void displayMenu(const bool hasEmployees, const bool hasPayments) {
     cout << endl;
-    cout << "a. Input an Employee." << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+    cout << "                     P R O G R A M   M E N U                     " << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+    cout << "A - Input an Employee into the system." << endl;
     if (hasEmployees)
-        cout << "b. Input a Payment for an existing Employee." << endl;
+        cout << "B - Input a Payment for an existing Employee." << endl;
     if (hasPayments) {
-        cout << "c. Print the Payroll Report for an specific employee." << endl;
-        cout << "d. Print the Payroll Report for all the employees." << endl;
+        cout << "C - Print the Addition & Average Payroll Report for a current & specific employee." << endl;
+        cout << "D - Print the Addition & Average Payroll Report for all the company's employees." << endl;
     }
-    cout << "X. Exit the Program." << endl;
+    cout << "X - Exit the Program." << endl;
     cout << endl;
 }
 
@@ -1213,24 +1221,22 @@ void showEmployeesTable(const vector<Employee> &employees) {
     cout << endl;
 
     // Finds the largest full name's length among the employees using max_element
-    const auto largestEmployeeIter = max_element(employees.begin(), employees.end(),
-                                                 [](const Employee &a, const Employee &b) {
-                                                     return a.fullName().size() < b.fullName().size();
-                                                 });
-    const int largestFullNameLength = static_cast<int>(largestEmployeeIter->fullName().size()); // Typecasting from size_t to int, just to avoid a warning
+    const auto largestEmployeeFullNameFirstIterator = max_element(employees.begin(), employees.end(),
+                                                                  [](const Employee &a, const Employee &b) {
+                                                                      return a.fullName().size() < b.fullName().size();
+                                                                  });
+    const int largestFullNameLength = static_cast<int>(largestEmployeeFullNameFirstIterator->fullName().size()); // Typecasting from size_t to int, just to avoid a warning
 
-    // bdc0a2fb-d39e-0242-9a0a-4e760153f18d
+    // Table Header
     renderLineUnderTableRow(largestFullNameLength);
-
     cout << "|                Unique ID             | Full Name ";
     printNTimes(" ", largestFullNameLength - 10);
     cout << " |" << endl;
-
     renderLineUnderTableRow(largestFullNameLength);
 
+    // Each one of the rows
     for (const Employee &employee: employees) {
         cout << "| " << employee.id << " | " << setw(largestFullNameLength) << setfill(' ') << left << employee.fullName() << " |" << endl;
-
         renderLineUnderTableRow(largestFullNameLength);
     }
 }
@@ -1245,6 +1251,9 @@ void renderLineUnderTableRow(const int largestFullNameLength) {
 // Adds an Employee structure variable to the reference of a given vector of Employees
 void addEmployee(vector<Employee> &employees) {
     cout << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+    cout << "                  A D D I N G   E M P L O Y E E                  " << endl;
+    cout << "-----------------------------------------------------------------" << endl;
     const string firstName = getStringFromMessage("Please type the first name of the new Employee: ");
     const string lastName = getStringFromMessage("Please type the last name of the new Employee: ");
     const double regRate = getDouble("Please type the regular payment rate of the new Employee", MIN_HOURLY_WAGE, MAX_HOURLY_WAGE, true);
@@ -1256,11 +1265,15 @@ void addPayment(vector<Payment> &payments, const vector<Employee> &employees) {
     string employeeId;
     bool theEmployeeDoNotExist;
 
+    cout << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+    cout << "                   A D D I N G   P A Y M E N T                   " << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+
     // First we show the employee's table to the user, so that the user can decide which employee to associate the new payment with
     showEmployeesTable(employees);
 
     do {
-        cout << endl;
         employeeId = getStringFromMessage("And now I need you to either type or copy/paste the id of the employee to whom you are going to associate the payment: ");
         theEmployeeDoNotExist = !existEmployee(employees, employeeId);
         if (theEmployeeDoNotExist)
@@ -1291,11 +1304,15 @@ void generateAndPrintCurrentEmployeePayrollReports(vector<Payment> &payments, co
     bool theEmployeeDoNotExist;
     bool theEmployeeHasPayments;
 
+    cout << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+    cout << "  C U R R E N T   E M P L O Y E E   P A Y R O L L   R E P O R T  " << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+
     // First we show the employee's table to the user, so that the user can decide for which employee he wants to print the Payment Report
     showEmployeesTable(employees);
 
     do {
-        cout << endl;
         employeeId = getStringFromMessage("And now I need you to either type or copy/paste the id of the employee for whom you want to print the Payroll Report: ");
         theEmployeeDoNotExist = !existEmployee(employees, employeeId);
         if (theEmployeeDoNotExist)
@@ -1325,6 +1342,11 @@ void generateAndPrintCompanyPayrollReports(const vector<Payment> &payments) {
     // First we must generate the company's addition & average PayrollReports
     const PayrollReport additionPayrollReport = createAdditionPayrollReport(payments);
     const PayrollReport averagePayrollReport = createAveragePayrollReport(payments);
+
+    cout << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+    cout << "           C O M P A N Y   P A Y R O L L   R E P O R T           " << endl;
+    cout << "-----------------------------------------------------------------" << endl;
 
     // And now we can finally send both to print
     printCompanyPayrollReports(additionPayrollReport, averagePayrollReport);
