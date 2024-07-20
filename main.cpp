@@ -582,10 +582,10 @@ char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
             cout << "The only available options are: " << endl;
             const size_t size = allowedMenuOptions.size();
             for (int i = 0; i < size; i++) {
-                std::cout << allowedMenuOptions[i];
-                std::cout << (i == size - 2 ? ", or " : i == size - 1 ? "" : ", ");
+                cout << allowedMenuOptions[i];
+                cout << (i == size - 2 ? ", or " : i == size - 1 ? "" : ", ");
             }
-            std::cout << ". Try again." << endl;
+            cout << ". Try again." << endl;
         }
     } while (isInvalidAnswer);
 
@@ -867,7 +867,7 @@ Employee getEmployeById(const vector<Employee> &employees, const string &employe
 
 // Deletes an Employee structure variable by a given employee's id
 void deleteEmployeById(vector<Employee> &employees, const string &employeeId) {
-    auto it = std::remove_if(employees.begin(), employees.end(), [&](const Employee &emp) {
+    const auto it = remove_if(employees.begin(), employees.end(), [&](const Employee &emp) {
         return emp.id == employeeId;
     });
     employees.erase(it, employees.end());
