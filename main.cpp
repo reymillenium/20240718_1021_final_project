@@ -359,6 +359,9 @@ bool isValidMenuSelection(char input, const vector<char> &);
 // Adds an Employee structure variable to the reference of a given vector of Employees
 void addEmployee(vector<Employee> &);
 
+// Removes an Employee structure variable from the reference of a given vector of Employees, by its given id
+void deleteCurrentEmployee(vector<Employee> &);
+
 // Adds a Payment structure variable, associated to a specific Employee, to the reference of a given vector of Payments
 void addPayment(vector<Payment> &, const vector<Employee> &);
 
@@ -387,6 +390,9 @@ bool employeeHasPayments(const vector<Payment> &, const string &);
 
 // Retrieves an Employee structure variable by a given employee's id
 Employee getEmployeById(const vector<Employee> &, const string &);
+
+// Deletes an Employee structure variable by a given employee's id
+void deleteEmployeById(vector<Employee> &, const string &);
 
 // Generates a EmployeePayrollReport with the addition of all the Payment structure variables related to a given employee's id
 EmployeePayrollReport createAdditionEmployeePayrollReport(const vector<Payment> &, const string &);
@@ -1151,7 +1157,7 @@ void displayMenu(const bool hasEmployees, const bool hasPayments) {
     cout << ADD_EMPLOYEE_OPTION << " - Input an Employee into the system." << endl;
 
     if (hasEmployees) {
-        // cout << DELETE_EMPLOYEE_OPTION << " - Delete an Employee from our system." << endl;
+        cout << DELETE_EMPLOYEE_OPTION << " - Delete an Employee from our system." << endl;
         cout << ADD_PAYMENT_OPTION << " - Input a Payment for an existing Employee." << endl;
     }
 
@@ -1176,11 +1182,14 @@ char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
     bool isInvalidAnswer;
 
     // We dinamically fill/conform the allowed menu options to choose from, depending of the existence or not of at least one employee & if we have at least one payment
-    vector<char> allowedMenuOptions {ADD_EMPLOYEE_OPTION, QUITTING_OPTION};
-    const vector<char> ifHasEmployeesAnswers {ADD_PAYMENT_OPTION};
-    const vector<char> ifHasPaymentsAnswers {GENERATE_AND_PRINT_CURRENT_EPR_OPTION, GENERATE_AND_PRINT_COMPANY_PR_OPTION};
-    if (hasEmployees) allowedMenuOptions.insert(allowedMenuOptions.end(), ifHasEmployeesAnswers.begin(), ifHasEmployeesAnswers.end());
-    if (hasPayments) allowedMenuOptions.insert(allowedMenuOptions.end(), ifHasPaymentsAnswers.begin(), ifHasPaymentsAnswers.end());
+    vector<char> allowedMenuOptions {ADD_EMPLOYEE_OPTION};
+    const vector<char> ifHasEmployeesOptions {DELETE_EMPLOYEE_OPTION, ADD_PAYMENT_OPTION};
+    const vector<char> ifHasPaymentsOptions {GENERATE_AND_PRINT_CURRENT_EPR_OPTION, GENERATE_AND_PRINT_COMPANY_PR_OPTION};
+    const vector<char> noMatterWhatAndLastOptions {QUITTING_OPTION}; // Done this way so the validation message with the available options gets shown ordered alphabetically
+
+    if (hasEmployees) allowedMenuOptions.insert(allowedMenuOptions.end(), ifHasEmployeesOptions.begin(), ifHasEmployeesOptions.end());
+    if (hasPayments) allowedMenuOptions.insert(allowedMenuOptions.end(), ifHasPaymentsOptions.begin(), ifHasPaymentsOptions.end());
+    allowedMenuOptions.insert(allowedMenuOptions.end(), noMatterWhatAndLastOptions.begin(), noMatterWhatAndLastOptions.end());
 
     do {
         selection = static_cast<char>(toupper(getAlphaChar("Type your selection please"))); // Typecasting to avoid a warning
@@ -1206,6 +1215,9 @@ void processMenuSelection(const char menuSelection, vector<Employee> &employees,
         case ADD_EMPLOYEE_OPTION:
             addEmployee(employees);
             break;
+        case DELETE_EMPLOYEE_OPTION:
+            deleteCurrentEmployee(employees);
+            break;
         case ADD_PAYMENT_OPTION:
             addPayment(payments, employees);
             break;
@@ -1215,8 +1227,10 @@ void processMenuSelection(const char menuSelection, vector<Employee> &employees,
         case GENERATE_AND_PRINT_COMPANY_PR_OPTION:
             generateAndPrintCompanyPayrollReports(payments);
             break;
-        default:
+        case QUITTING_OPTION:
             sayGoodbyeToTheUser();
+            break;
+        default: ;
     }
 }
 
@@ -1263,6 +1277,30 @@ void addEmployee(vector<Employee> &employees) {
     const string lastName = getStringFromMessage("Please type the last name of the new Employee: ");
     const double regRate = getDouble("Please type the regular payment rate of the new Employee", MIN_HOURLY_WAGE, MAX_HOURLY_WAGE, true);
     employees.push_back(Employee {.id = getUUID(), .firstName = firstName, .lastName = lastName, .regRate = regRate});
+}
+
+// Removes an Employee structure variable from the reference of a given vector of Employees, by its given id
+void deleteCurrentEmployee(vector<Employee> &employees) {
+    string employeeId; // For the employee's id, to be typed or pasted by the user later
+    bool theEmployeeDoNotExist; // If the user do not exist based on the entered id
+
+    cout << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+    cout << "                D E L E T I N G   E M P L O Y E E                " << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+
+    // First we show the current employee's table to the user, so that the user can decide which employee to delete
+    showEmployeesTable(employees);
+
+    do {
+        employeeId = getStringFromMessage("And now I need you to either type or copy/paste the id of the employee that you want to delete: ");
+        theEmployeeDoNotExist = !existEmployee(employees, employeeId);
+        if (theEmployeeDoNotExist)
+            cout << "We don't have an Employee with such ID. Try again please." << endl;
+    } while (theEmployeeDoNotExist);
+
+    // Once we know that an Employee exist with such id, then we can safely delete it
+    deleteEmployeById(employees, employeeId);
 }
 
 // Adds a Payment structure variable, associated to a specific Employee, to the reference of a given vector of Payments
@@ -1371,6 +1409,14 @@ bool employeeHasPayments(const vector<Payment> &payments, const string &employee
 Employee getEmployeById(const vector<Employee> &employees, const string &employeeId) {
     // Let's just return it directly
     return *find_if(employees.begin(), employees.end(), [&](const Employee &emp) { return emp.id == employeeId; });
+}
+
+// Deletes an Employee structure variable by a given employee's id
+void deleteEmployeById(vector<Employee> &employees, const string &employeeId) {
+    auto it = std::remove_if(employees.begin(), employees.end(), [&](const Employee &emp) {
+        return emp.id == employeeId;
+    });
+    employees.erase(it, employees.end());
 }
 
 // Generates a EmployeePayrollReport with the addition of all the Payment structure variables related to a given employee's id
