@@ -330,9 +330,15 @@ struct PayrollReport {
 
 // Logical Interpretation: An EmployeePayrollReport is a PayrollReport, plus adding an employee's id
 struct EmployeePayrollReport : PayrollReport {
+    // The Employee could be deleted from the system, but we still have its data (I'm not using an Employee, to avoid theorically a DB persistence validation)
+    // ...and we just need a few fields anyway, so it will remain denormalized with these 3 elements, instead of using an Employee structure variable
+    string firstName;
+    string lastName;
     string employeeId;
 
     EmployeePayrollReport() = default;
+
+    [[nodiscard]] string fullName() const { return firstName + " " + lastName; }
 };
 
 
@@ -398,14 +404,14 @@ Employee getEmployeById(const vector<Employee> &, const string &);
 // Deletes an Employee structure variable by a given employee's id
 void deleteEmployeById(vector<Employee> &, const string &);
 
-// Generates a EmployeePayrollReport with the addition of all the Payment structure variables related to a given employee's id
-EmployeePayrollReport createAdditionEmployeePayrollReport(const vector<Payment> &, const string &);
+// Generates a EmployeePayrollReport with the addition of all the Payment structure variables related to a given employee
+EmployeePayrollReport createAdditionEmployeePayrollReport(const vector<Payment> &, const Employee &);
 
 // Generates a PayrollReport with the addition of all the Payment structure variables's data of the whole company across the time
 PayrollReport createAdditionPayrollReport(const vector<Payment> &);
 
-// Generates a EmployeePayrollReport with the average of all the Payment structure variables related to a given employee's id
-EmployeePayrollReport createAverageEmployeePayrollReport(const vector<Payment> &, const string &);
+// Generates a EmployeePayrollReport with the average of all the Payment structure variables related to a given employee
+EmployeePayrollReport createAverageEmployeePayrollReport(const vector<Payment> &, const Employee &);
 
 // Generates a PayrollReport with the average of all the Payment structure variables's data of the whole company across the time
 PayrollReport createAveragePayrollReport(const vector<Payment> &);
@@ -414,7 +420,7 @@ PayrollReport createAveragePayrollReport(const vector<Payment> &);
 void printCompanyPayrollReports(const PayrollReport &, const PayrollReport &);
 
 // Prints on the console both, the addition & average given EmployeePayrollReports
-void printEmployeePayrollReports(const EmployeePayrollReport &, const EmployeePayrollReport &, const Employee &);
+void printEmployeePayrollReports(const EmployeePayrollReport &, const EmployeePayrollReport &);
 
 // Prints either a EmployeePayrollReport or a PayrollReport structure variable, with addition and average data,
 // as we pass as argument a father struct PayrollReport variable, and from the received parameter we won't use the employee's id anyway at this point (either done before or not needed)
@@ -1389,11 +1395,11 @@ void generateAndPrintCurrentEmployeePayrollReports(vector<Payment> &payments, co
         const Employee employee = getEmployeById(employees, employeeId);
 
         // Once we know that the Employee has at least an associated Payment, we can safely generate its pertinent addition & average EmployeePayrollReport
-        const EmployeePayrollReport additionEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employeeId);
-        const EmployeePayrollReport averageEmployeePayrollReport = createAverageEmployeePayrollReport(payments, employeeId);
+        const EmployeePayrollReport additionEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employee);
+        const EmployeePayrollReport averageEmployeePayrollReport = createAverageEmployeePayrollReport(payments, employee);
 
         // And now we can finally send both to print
-        printEmployeePayrollReports(additionEmployeePayrollReport, averageEmployeePayrollReport, employee);
+        printEmployeePayrollReports(additionEmployeePayrollReport, averageEmployeePayrollReport);
     } else {
         cout << "The selected employee has not received any payment yet. Good bye." << endl;
     }
@@ -1438,13 +1444,13 @@ void deleteEmployeById(vector<Employee> &employees, const string &employeeId) {
     employees.erase(it, employees.end());
 }
 
-// Generates a EmployeePayrollReport with the addition of all the Payment structure variables related to a given employee's id
-EmployeePayrollReport createAdditionEmployeePayrollReport(const vector<Payment> &payments, const string &employeeId) {
-    EmployeePayrollReport theAdditionEmployeePayrollReport {.employeeId = employeeId}; // Associated to the employee
+// Generates a EmployeePayrollReport with the addition of all the Payment structure variables related to a given employee
+EmployeePayrollReport createAdditionEmployeePayrollReport(const vector<Payment> &payments, const Employee &employee) {
+    EmployeePayrollReport theAdditionEmployeePayrollReport {.employeeId = employee.id, .firstName = employee.firstName, .lastName = employee.lastName}; // Gets associated to the employee
 
     // And then we increase each respective field on each iteration, to leave it as an Addition EmployeePayrollReport
     for (const Payment &payment: payments) {
-        if (payment.employeeId == employeeId) {
+        if (payment.employeeId == employee.id) {
             theAdditionEmployeePayrollReport.paymentsAmount++;
             theAdditionEmployeePayrollReport.regHours += payment.regHours;
             theAdditionEmployeePayrollReport.otHours += payment.otHours;
@@ -1476,10 +1482,10 @@ PayrollReport createAdditionPayrollReport(const vector<Payment> &payments) {
     return anAdditionPayrollReport;
 }
 
-// Generates a EmployeePayrollReport with the average of all the Payment structure variables related to a given employee's id
-EmployeePayrollReport createAverageEmployeePayrollReport(const vector<Payment> &payments, const string &employeeId) {
-    // First we get a good old fashion & regular EmployeePayrollReport based on the given employeeId
-    EmployeePayrollReport anAdditionEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employeeId);
+// Generates a EmployeePayrollReport with the average of all the Payment structure variables related to a given employee
+EmployeePayrollReport createAverageEmployeePayrollReport(const vector<Payment> &payments, const Employee &employee) {
+    // First we get a good old fashion & regular EmployeePayrollReport based on the given employee
+    EmployeePayrollReport anAdditionEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employee);
 
     // Then we count how many payments has associated the employee to whom belongs the given id, so we can average his payment stats right after that
     // const int empoloyeePaymentsAmount = count_if(payments.begin(), payments.end(), [&](const Payment &payment) { return payment.employeeId == employeeId; });
@@ -1523,9 +1529,9 @@ void printCompanyPayrollReports(const PayrollReport &additionPR, const PayrollRe
 }
 
 // Prints on the console both, the addition & average given EmployeePayrollReports
-void printEmployeePayrollReports(const EmployeePayrollReport &additionEPR, const EmployeePayrollReport &averageEPR, const Employee &employee) {
+void printEmployeePayrollReports(const EmployeePayrollReport &additionEPR, const EmployeePayrollReport &averageEPR) {
     cout << endl;
-    cout << "The employee " << employee.fullName() << ", with id " << employee.id << " has received " << additionEPR.paymentsAmount << " payment" << (additionEPR.paymentsAmount == 1 ? "" : "s") << "." << endl;
+    cout << "The employee " << additionEPR.fullName() << ", with id " << additionEPR.employeeId << " has received " << additionEPR.paymentsAmount << " payment" << (additionEPR.paymentsAmount == 1 ? "" : "s") << "." << endl;
     printPayrollReportsTable(additionEPR, averageEPR);
 }
 
