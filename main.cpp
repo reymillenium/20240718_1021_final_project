@@ -267,8 +267,8 @@ string getLowerCase(string input);
 // Converts a string to uppercase and returns it
 string getUpperCase(string input);
 
-// Generates a unique id as a string. Format: bdc0a2fb-d39e-0242-9a0a-4e760153f18d
-string getUuid();
+// Generates a Universally Unique IDentifier (the usual 36-character alphanumeric string. UUID style) as a string. Format: bdc0a2fb-d39e-0242-9a0a-4e760153f18d
+string getUUID();
 
 
 /**
@@ -1102,26 +1102,19 @@ string getUpperCase(string input) {
     return destinationString;
 }
 
-// Generates a unique id as a string. Format: bdc0a2fb-d39e-0242-9a0a-4e760153f18d
-string getUuid() {
+// Generates a Universally Unique IDentifier (the usual 36-character alphanumeric string. UUID style) as a string. Format: bdc0a2fb-d39e-0242-9a0a-4e760153f18d
+string getUUID() {
     static random_device dev;
     static mt19937 rng(dev());
-    uniform_int_distribution<int> dist(0, 15);
+    uniform_int_distribution<int> dist(0, 15); // basic random int distribution of the indexes for 16 possible characters to choose from
     constexpr bool mustAddDashes[] = {false, false, false, false, true, false, true, false, true, false, true, false, false, false, false, false};
-    string generatedID;
-
-    // for (int i = 0; i < 16; i++) {
-    //     const auto v = "0123456789abcdef";
-    //     if (mustAddDashes[i]) generatedID += "-";
-    //     generatedID += v[dist(rng)];
-    //     generatedID += v[dist(rng)];
-    // }
+    string generatedID; // The conformed string to return
 
     const string allowedCharacters = "0123456789abcdef";
     for (const bool mustAddDashNow: mustAddDashes) {
-        if (mustAddDashNow) generatedID += "-";
-        generatedID += allowedCharacters[dist(rng)];
-        generatedID += allowedCharacters[dist(rng)];
+        if (mustAddDashNow) generatedID += "-"; // We insert the dash according to the planification inside the boolean array
+        generatedID += allowedCharacters[dist(rng)]; // Fully random index
+        generatedID += allowedCharacters[dist(rng)]; // Fully random index again, so we have at least a pair of characters (as string) added per iteration
     }
 
     return generatedID;
@@ -1173,21 +1166,23 @@ bool isValidMenuSelection(const char input, const vector<char> &allowedAnswers) 
 char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
     char selection = ADD_EMPLOYEE_OPTION;
     bool isInvalidAnswer;
-    vector<char> allowedAnswers {ADD_EMPLOYEE_OPTION, QUITTING_OPTION};
+
+    // We dinamically fill/conform the allowed menu options to choose from, depending of the existence or not of at least one employee & if we have at least one payment
+    vector<char> allowedMenuOptions {ADD_EMPLOYEE_OPTION, QUITTING_OPTION};
     const vector<char> ifHasEmployeesAnswers {ADD_PAYMENT_OPTION};
     const vector<char> ifHasPaymentsAnswers {GENERATE_AND_PRINT_CURRENT_EPR_OPTION, GENERATE_AND_PRINT_COMPANY_PR_OPTION};
-    if (hasEmployees) allowedAnswers.insert(allowedAnswers.end(), ifHasEmployeesAnswers.begin(), ifHasEmployeesAnswers.end());
-    if (hasPayments) allowedAnswers.insert(allowedAnswers.end(), ifHasPaymentsAnswers.begin(), ifHasPaymentsAnswers.end());
+    if (hasEmployees) allowedMenuOptions.insert(allowedMenuOptions.end(), ifHasEmployeesAnswers.begin(), ifHasEmployeesAnswers.end());
+    if (hasPayments) allowedMenuOptions.insert(allowedMenuOptions.end(), ifHasPaymentsAnswers.begin(), ifHasPaymentsAnswers.end());
 
     do {
         selection = static_cast<char>(toupper(getAlphaChar("Type your selection please"))); // Typecasting to avoid a warning
 
-        isInvalidAnswer = !isValidMenuSelection(selection, allowedAnswers);
+        isInvalidAnswer = !isValidMenuSelection(selection, allowedMenuOptions);
         if (isInvalidAnswer) {
             cout << "The only allowed answers are: " << endl;
-            const size_t size = allowedAnswers.size();
+            const size_t size = allowedMenuOptions.size();
             for (int i = 0; i < size; i++) {
-                std::cout << allowedAnswers[i];
+                std::cout << allowedMenuOptions[i];
                 std::cout << (i == size - 2 ? ", or " : ", ");
             }
             std::cout << ". Try again." << endl;
@@ -1259,13 +1254,13 @@ void addEmployee(vector<Employee> &employees) {
     const string firstName = getStringFromMessage("Please type the first name of the new Employee: ");
     const string lastName = getStringFromMessage("Please type the last name of the new Employee: ");
     const double regRate = getDouble("Please type the regular payment rate of the new Employee", MIN_HOURLY_WAGE, MAX_HOURLY_WAGE, true);
-    employees.push_back(Employee {.id = getUuid(), .firstName = firstName, .lastName = lastName, .regRate = regRate});
+    employees.push_back(Employee {.id = getUUID(), .firstName = firstName, .lastName = lastName, .regRate = regRate});
 }
 
 // Adds a Payment structure variable, associated to a specific Employee, to the reference of a given vector of Payments
 void addPayment(vector<Payment> &payments, const vector<Employee> &employees) {
-    string employeeId;
-    bool theEmployeeDoNotExist;
+    string employeeId; // For the employee's id, to be typed or pasted by the user later
+    bool theEmployeeDoNotExist; // If the user do not exist based on the entered id
 
     cout << endl;
     cout << "-----------------------------------------------------------------" << endl;
@@ -1302,9 +1297,9 @@ void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
 
 // Prints on the terminal a PayrollReport for a specific Employee
 void generateAndPrintCurrentEmployeePayrollReports(vector<Payment> &payments, const vector<Employee> &employees) {
-    string employeeId;
-    bool theEmployeeDoNotExist;
-    bool theEmployeeHasPayments;
+    string employeeId; // For the employee's id, to be typed or pasted by the user later
+    bool theEmployeeDoNotExist; // If the user do not exist based on the entered id
+    bool theEmployeeHasPayments; // If the employee has received at least one payment
 
     cout << endl;
     cout << "-----------------------------------------------------------------" << endl;
@@ -1372,9 +1367,9 @@ Employee getEmployeById(const vector<Employee> &employees, const string &employe
 
 // Generates a EmployeePayrollReport with the addition of all the Payment structure variables related to a given employee's id
 EmployeePayrollReport createAdditionEmployeePayrollReport(const vector<Payment> &payments, const string &employeeId) {
-    EmployeePayrollReport theAdditionEmployeePayrollReport {.employeeId = employeeId};
+    EmployeePayrollReport theAdditionEmployeePayrollReport {.employeeId = employeeId}; // Associated to the employee
 
-    // So now we can increase each respective field, to leave it as an addition EmployeePayrollReport
+    // And then we increase each respective field on each iteration, to leave it as an Addition EmployeePayrollReport
     for (const Payment &payment: payments) {
         if (payment.employeeId == employeeId) {
             theAdditionEmployeePayrollReport.paymentsAmount++;
@@ -1392,9 +1387,9 @@ EmployeePayrollReport createAdditionEmployeePayrollReport(const vector<Payment> 
 
 // Generates a PayrollReport with the addition of all the Payment structure variables's data of the whole company across the time
 PayrollReport createAdditionPayrollReport(const vector<Payment> &payments) {
-    PayrollReport anAdditionPayrollReport;
+    PayrollReport anAdditionPayrollReport; // Defined to be filled with data next
 
-    // So now we can increase each respective field, to leave it as an addition PayrollReport
+    // And then we increase each respective field, to leave it as an Addition PayrollReport
     for (const Payment &payment: payments) {
         anAdditionPayrollReport.paymentsAmount++;
         anAdditionPayrollReport.regHours += payment.regHours;
@@ -1410,14 +1405,14 @@ PayrollReport createAdditionPayrollReport(const vector<Payment> &payments) {
 
 // Generates a EmployeePayrollReport with the average of all the Payment structure variables related to a given employee's id
 EmployeePayrollReport createAverageEmployeePayrollReport(const vector<Payment> &payments, const string &employeeId) {
-    // First we get a good old fashion & regular PaymentReport based on the given employeeId
+    // First we get a good old fashion & regular EmployeePayrollReport based on the given employeeId
     EmployeePayrollReport anAdditionEmployeePayrollReport = createAdditionEmployeePayrollReport(payments, employeeId);
 
-    // And now we must count how many payments has associated the employee to whom belongs the given id, so we can average his payment stats right after that
+    // Then we count how many payments has associated the employee to whom belongs the given id, so we can average his payment stats right after that
     // const int empoloyeePaymentsAmount = count_if(payments.begin(), payments.end(), [&](const Payment &payment) { return payment.employeeId == employeeId; });
-    const int employeePaymentsAmount = anAdditionEmployeePayrollReport.paymentsAmount; // It's way simpler & faster this way
+    const int employeePaymentsAmount = anAdditionEmployeePayrollReport.paymentsAmount; // Forget it. It's way simpler & faster this way
 
-    // So now we can average/update each field, to leave it as an average EmployeePayrollReport
+    // And now we must average/update each field, to leave it as an average EmployeePayrollReport
     anAdditionEmployeePayrollReport.regHours /= employeePaymentsAmount;
     anAdditionEmployeePayrollReport.otHours /= employeePaymentsAmount;
     anAdditionEmployeePayrollReport.regPay /= employeePaymentsAmount;
@@ -1425,18 +1420,18 @@ EmployeePayrollReport createAverageEmployeePayrollReport(const vector<Payment> &
     anAdditionEmployeePayrollReport.fica /= employeePaymentsAmount;
     anAdditionEmployeePayrollReport.socSec /= employeePaymentsAmount;
 
-    return anAdditionEmployeePayrollReport;
+    return anAdditionEmployeePayrollReport; // Turned into an Average EmployeePayrollReport at this point
 }
 
 // Generates a PayrollReport with the average of all the Payment structure variables's data of the whole company across the time
 PayrollReport createAveragePayrollReport(const vector<Payment> &payments) {
-    // First we get a good old fashion & regular EmployeePayrollReport with addition data, of all the Payment structure variables's data of the whole company across the time
+    // First we get a good old fashion & regular PayrollReport with addition data, of all the Payment structure variables's data of the whole company across the time
     PayrollReport anAdditionPayrollReport = createAdditionPayrollReport(payments);
 
-    // And now we must count how many payments exist, so we can average the PayrollReport's stats right after that
+    // Then we count how many payments exist, so we can average the PayrollReport's stats right after that
     const int companyPaymentsAmount = static_cast<int>(payments.size()); // It's way simpler & faster this way. Also casting from size_t to int to avoid an annoying warning
 
-    // So now we can average/update each field, to leave it as an average PayrollReport
+    // And now we must average/update each field, to leave it as an average PayrollReport
     anAdditionPayrollReport.regHours /= companyPaymentsAmount;
     anAdditionPayrollReport.otHours /= companyPaymentsAmount;
     anAdditionPayrollReport.regPay /= companyPaymentsAmount;
@@ -1444,7 +1439,7 @@ PayrollReport createAveragePayrollReport(const vector<Payment> &payments) {
     anAdditionPayrollReport.fica /= companyPaymentsAmount;
     anAdditionPayrollReport.socSec /= companyPaymentsAmount;
 
-    return anAdditionPayrollReport;
+    return anAdditionPayrollReport; // Turned into an Average PayrollReport at this point
 }
 
 // Prints on the console both, the addition & average PayrollReports of the company
@@ -1464,9 +1459,9 @@ void printEmployeePayrollReports(const EmployeePayrollReport &additionEPR, const
 // Prints either a EmployeePayrollReport or a PayrollReport structure variable, with addition and average data,
 // as we pass as argument a father struct PayrollReport variable, and from the received parameter we won't use the employee's id anyway at this point (either done before or not needed)
 void printPayrollReportsTable(const PayrollReport &additionPR, const PayrollReport &averagePR) {
-    constexpr int MAX_ROW_WIDTH = 50;
-    constexpr int ADDITION_COL_INNER_WIDTH = 12;
-    constexpr int AVERAGE_COL_INNER_WIDTH = 11;
+    constexpr int MAX_ROW_WIDTH = 50; // We set the overall width of the table based on this precisely. The columns must fit inside
+    constexpr int ADDITION_COL_INNER_WIDTH = 12; // To customize the width of the Addition Column, so it looks good later
+    constexpr int AVERAGE_COL_INNER_WIDTH = 11; // To customize the width of the Average Column, so it looks good later
 
     printNTimesAndBreak("-", MAX_ROW_WIDTH);
     cout << "|       Field       |   Addition   |   Average   |" << endl;
