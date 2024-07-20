@@ -56,9 +56,10 @@ constexpr double OT_MULT = 1.5;
 
 constexpr char ADD_EMPLOYEE_OPTION = 'A';
 constexpr char DELETE_EMPLOYEE_OPTION = 'B';
-constexpr char ADD_PAYMENT_OPTION = 'C';
-constexpr char GENERATE_AND_PRINT_CURRENT_EPR_OPTION = 'D';
-constexpr char GENERATE_AND_PRINT_COMPANY_PR_OPTION = 'E';
+constexpr char SHOW_EMPLOYEES_OPTION = 'C';
+constexpr char ADD_PAYMENT_OPTION = 'D';
+constexpr char GENERATE_AND_PRINT_CURRENT_EPR_OPTION = 'E';
+constexpr char GENERATE_AND_PRINT_COMPANY_PR_OPTION = 'F';
 constexpr char QUITTING_OPTION = 'X';
 
 
@@ -361,6 +362,9 @@ void addEmployee(vector<Employee> &);
 
 // Removes an Employee structure variable from the reference of a given vector of Employees, by its given id
 void deleteCurrentEmployee(vector<Employee> &);
+
+// Shows the table with all the current employees
+void showCurrentEmployeesTable(const vector<Employee> &);
 
 // Adds a Payment structure variable, associated to a specific Employee, to the reference of a given vector of Payments
 void addPayment(vector<Payment> &, const vector<Employee> &);
@@ -1158,6 +1162,7 @@ void displayMenu(const bool hasEmployees, const bool hasPayments) {
 
     if (hasEmployees) {
         cout << DELETE_EMPLOYEE_OPTION << " - Delete an Employee from our system." << endl;
+        cout << SHOW_EMPLOYEES_OPTION << " - Show all the employees in our system." << endl;
         cout << ADD_PAYMENT_OPTION << " - Input a Payment for an existing Employee." << endl;
     }
 
@@ -1183,7 +1188,7 @@ char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
 
     // We dinamically fill/conform the allowed menu options to choose from, depending of the existence or not of at least one employee & if we have at least one payment
     vector<char> allowedMenuOptions {ADD_EMPLOYEE_OPTION};
-    const vector<char> ifHasEmployeesOptions {DELETE_EMPLOYEE_OPTION, ADD_PAYMENT_OPTION};
+    const vector<char> ifHasEmployeesOptions {DELETE_EMPLOYEE_OPTION, SHOW_EMPLOYEES_OPTION, ADD_PAYMENT_OPTION};
     const vector<char> ifHasPaymentsOptions {GENERATE_AND_PRINT_CURRENT_EPR_OPTION, GENERATE_AND_PRINT_COMPANY_PR_OPTION};
     const vector<char> noMatterWhatAndLastOptions {QUITTING_OPTION}; // Done this way so the validation message with the available options gets shown ordered alphabetically
 
@@ -1217,6 +1222,9 @@ void processMenuSelection(const char menuSelection, vector<Employee> &employees,
             break;
         case DELETE_EMPLOYEE_OPTION:
             deleteCurrentEmployee(employees);
+            break;
+        case SHOW_EMPLOYEES_OPTION:
+            showCurrentEmployeesTable(employees);
             break;
         case ADD_PAYMENT_OPTION:
             addPayment(payments, employees);
@@ -1301,6 +1309,17 @@ void deleteCurrentEmployee(vector<Employee> &employees) {
 
     // Once we know that an Employee exist with such id, then we can safely delete it
     deleteEmployeById(employees, employeeId);
+}
+
+// Shows the table with all the current employees
+void showCurrentEmployeesTable(const vector<Employee> &employees) {
+    cout << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+    cout << "                C U R R E N T   E M P L O Y E E S                " << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+
+    // First we show the employee's table to the user, so that the user can decide which employee to associate the new payment with
+    showEmployeesTable(employees);
 }
 
 // Adds a Payment structure variable, associated to a specific Employee, to the reference of a given vector of Payments
