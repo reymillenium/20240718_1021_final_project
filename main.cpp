@@ -18,9 +18,9 @@
 
 #include <iostream>
 #include <string>  // for string, to_string, etc
-#include <cmath> // for sqrt, sin, pow
-#include <climits> // For SHRT_MAX, SHRT_MIN, etc
-#include <limits> // For SHRT_MAX, SHRT_MIN, etc
+// #include <cmath> // for sqrt, sin, pow
+// #include <climits> // For SHRT_MAX, SHRT_MIN, etc
+// #include <limits> // For SHRT_MAX, SHRT_MIN, etc
 #include <iomanip> // for setprecision, setw, fixed
 #include<array>  // for array
 #include<random> // for random_device
@@ -30,10 +30,9 @@
 #include <vector> // to use vectors
 #include <fstream> // For ifstream, ofstrea, fstream
 #include <numeric> // For accumulate, transform_reduce, inner_product (in the vectors)
-#include <algorithm> // For max_element, min_element, find, transform (to use in vectors), or for max(), reverse, count_if
+#include <algorithm> // For max_element, min_element, find, transform (to use in vectors), or for max(), reverse, count_if, any_of, all_of, none_of, etc
 #include <regex> // For regex, regex_match
-#include <cstring> // For strrev
-#include <filesystem>
+// #include <cstring> // For strrev
 
 using namespace std;
 
@@ -72,6 +71,12 @@ constexpr char QUITTING_OPTION = 'X';
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  **/
 
+
+// Prints a given value, of almost any kind, once in the terminal
+template<typename T>
+void print(const T &item) {
+    cout << item;
+}
 
 // Prints a given value, of almost any kind, N given times in the terminal
 template<typename T>
@@ -342,6 +347,10 @@ int main() {
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  **/
 
+
+// Prints a given value, of almost any kind, once in the terminal
+template<typename T>
+void print(const T &);
 
 // Prints a given value, of almost any kind, N given times in the terminal
 template<typename T>
