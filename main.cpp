@@ -73,10 +73,6 @@ constexpr char QUITTING_OPTION = 'X';
  **/
 
 
-// Prints a given value, of almost any kind, once in the terminal
-template<typename T>
-void print(const T &);
-
 // Prints a given value, of almost any kind, N given times in the terminal
 template<typename T>
 void printNTimes(const T &, int);
@@ -89,22 +85,11 @@ void printNTimesAndBreak(const T &, int);
 template<typename T>
 void printLine(const T &);
 
-// Prints a given value, of almost any kind, N given times in the terminal, and then breaks the line
-template<typename T>
-void printLineNTimes(const T &, int);
-
-// Gets several types of values from the console (except strings with spaces, objects, etc, among others), as a response of a given question
-template<typename T>
-auto getValue(const string &) -> T;
-
 // Determines if a given string is a valid integer, using a regular expression
 bool isInteger(const string &input);
 
 // Determines if a given string is a valid floating point number, using a regular expression
 bool isFloatingPoint(const string &input);
-
-// Receives and validates an integer number from the console
-int getInteger(const string &, int, int, bool = false, const string & = "Invalid input. Please try again.", const vector<int> & = {});
 
 // Receives and validates a double number (or the equivalent of an integer) from the console
 double getDouble(const string &, double, double, bool = false, const string & = "Invalid input. Please try again.", const vector<double> & = {});
@@ -118,157 +103,14 @@ char getAlphaChar(const string &, const string & = "Invalid input. Please try ag
 // Gets a string with or without spaces, from the terminal, as a response of a given question
 string getStringFromMessage(const string &);
 
-// Gets a string with or without spaces, from the terminal
-string getString();
-
-// Formats a given negative or positive int by inserting a comma every 3 digits of its equivalent string, to make it more readable, by US standards
-string humanizeInteger(long long int);
-
-// Formats a given negative or positive double by inserting a comma every 3 digits of its equivalent string, to make it more readable, by US standards
-string humanizeDouble(long double, int = 2);
-
 // Formats a given positive int by inserting a comma every 3 digits of its equivalent string, to make it more readable, by US standards
 string humanizeUnsignedInteger(unsigned long long int);
 
 // Formats a given positive double by inserting a comma every 3 digits of its equivalent string, to make it more readable, by US standards
 string humanizeUnsignedDouble(long double, int = 2);
 
-// Formats a given int by inserting a comma every 3 digits of its equivalent string, to make it more readable, and adds a customizable currency symbol
-string monetizeInteger(unsigned long int, bool = true, const string & = "$");
-
 // Formats a given double by inserting a comma every 3 digits of its equivalent string, to make it more readable, and adds a customizable currency symbol
 string monetizeDouble(long double, int = 2, bool = true, const string & = "$");
-
-// Rounds up a given double number, with a given amount of decimal places
-double roundUp(double, int);
-
-// Calculates the Recursive Sum of a given int number. Example: recursiveSum(5) == 5 + 4 + 3 + 2 + 1 = 15
-int recursiveSum(unsigned long long int);
-
-// Returns the string gramatic representation of an ordinal number, from a given int number
-string ordinalFromNumber(long long int);
-
-// Determines is a given int number is prime or not
-bool isPrime(unsigned long long int);
-
-// Calculates the sum of all the elements inside an array of integers
-int simpleSumOfIntegersInArray(const int [], int);
-
-// Calculates the sum of all the elements inside an array of integers
-int neatSumOfIntegersInArray(const int [], int);
-
-// Calculates the sum of all the elements inside an array of integers
-template<int N>
-int sumOfIntegersWithRangeOverReference(int (&)[N]);
-
-// Calculates the sum of all the elements inside an array of doubles
-double simpleSumOfDoublesInArray(const double [], int);
-
-// Calculates the sum of all the elements inside an array of doubles
-double neatSumOfDoublesInArray(const double [], int);
-
-// Calculates the sum of all the elements inside an array of doubles
-template<int N>
-double templateSumOfDoublesInArray(double (&)[N]);
-
-template<int N, int M>
-double templateSumOfDoublesInTwoDimensionsArray(double (&)[N][M]);
-
-// Calculates the average among all the numbers inside an array of integers
-double simpleAverageAmongIntegersInArray(const int [], int);
-
-// Calculates the average among all the numbers inside an array of integers
-double neatAverageAmongIntegersInArray(const int [], int);
-
-// Calculates the average among all the numbers inside an array of integers
-template<int N>
-int templateAverageAmongIntegersInArray(int (&)[N]);
-
-// Calculates the average among all the numbers inside an array of doubles
-double simpleAverageAmongDoublesInArray(const double [], int);
-
-// Calculates the average among all the numbers inside an array of doubles
-double neatAverageAmongDoublesInArray(const double [], int);
-
-template<int N>
-double templateAverageAmongDoublesInArray(double (&)[N]);
-
-template<int N, int M>
-double templateAverageAmongDoublesInTwoDimensionsArray(double (&)[N][M]);
-
-// Determines the highest number among an array of integers
-int simpleHighestIntegerInArray(const int [], int);
-
-// Determines the lower number among an array of integers
-int simpleLowerIntegerInArray(const int [], int);
-
-// Determines the lower number among an array of doubles
-double simpleLowerDoubleInArray(const double [], int);
-
-// Determines the higher number among an array of doubles
-double simpleHigherDoubleInArray(const double [], int);
-
-// Determines the lower number among a two-dimensional array of doubles
-template<int N, int M>
-double templateLowerDoubleInTwoDimensionsArray(double (&)[N][M]);
-
-// Determines the higher number among a two-dimensional array of doubles
-template<int N, int M>
-double templateHigherDoubleInTwoDimensionsArray(double (&)[N][M]);
-
-// Determines if the given value is lower than the also given minimum value
-bool isInvalid(long double value, double);
-
-// Prints on the terminal a text if the given value is lower than the also given minimum value
-void scoldUserIfInvalidInput(long double, double);
-
-// Function to validate the DateTime(YYYY-MM-DD HH:MM:SS)
-bool validDateTime(const string &);
-
-// Function to extract all the components of a DateTime(YYYY-MM-DD HH:MM:SS)
-vector<string> getComponentsFromDateTime(const string &);
-
-// Function to extract the year from a DateTime(YYYY-MM-DD HH:MM:SS)
-string getYearFromDateTime(const string &);
-
-// Function to extract the month from a DateTime(YYYY-MM-DD HH:MM:SS)
-string getMonthFromDateTime(const string &);
-
-// Function to extract the day from a DateTime(YYYY-MM-DD HH:MM:SS)
-string getDayFromDateTime(const string &);
-
-// Function to extract the hours from a DateTime(YYYY-MM-DD HH:MM:SS)
-string getHoursFromDateTime(const string &);
-
-// Function to extract the minutes from a DateTime(YYYY-MM-DD HH:MM:SS)
-string getMinutesFromDateTime(const string &);
-
-// Function to extract the seconds from a DateTime(YYYY-MM-DD HH:MM:SS)
-string getSecondsFromDateTime(const string &);
-
-// Function to convert from a military Time (24 hours format) to civilian Time (12 hours format with meridian)
-string convertTimeToCivilian(int, int);
-
-// Detects if a given filename exist or not on the root of the executable file
-bool fileExist(const string &);
-
-// Gets all the non-empty lines of text inside a given file name
-vector<string> getLinesFromFile(const string &);
-
-// Either creates a .txt file and adds text to it, or adds to an existent one
-void addTextToFile(const string &);
-
-// Converts a giving string to lowercase
-void strToLowerCase(string &input);
-
-// Converts a giving string to uppercase
-void strToUpperCase(string &input);
-
-// Converts a string to lowercase and returns it
-string getLowerCase(string input);
-
-// Converts a string to uppercase and returns it
-string getUpperCase(string input);
 
 // Generates a Universally Unique IDentifier (the usual 36-character alphanumeric string. UUID style) as a string. Format: bdc0a2fb-d39e-0242-9a0a-4e760153f18d
 string getUUID();
@@ -501,12 +343,6 @@ int main() {
  **/
 
 
-// Prints a given value, of almost any kind, once in the terminal
-template<typename T>
-void print(const T &item) {
-    cout << item;
-}
-
 // Prints a given value, of almost any kind, N given times in the terminal
 template<typename T>
 void printNTimes(const T &item, const int times) {
@@ -530,24 +366,6 @@ void printLine(const T &item) {
     cout << item << endl;
 }
 
-// Prints a given value, of almost any kind, N given times in the terminal, and then breaks the line
-template<typename T>
-void printLineNTimes(const T &item, const int times) {
-    for (int i = 0; i < times; i += 1) {
-        printLine(item);
-    }
-}
-
-// Gets several types of values from the console (except strings with spaces, objects, etc, among others), as a response of a given question
-template<typename T>
-auto getValue(const string &message) -> T {
-    cout << message;
-    T value;
-    cin >> value;
-    cin.ignore();
-    return value;
-}
-
 // Determines if a given string is a valid integer, using a regular expression
 bool isInteger(const string &input) {
     const regex pattern("^[+-]?[0-9]+$");
@@ -559,32 +377,6 @@ bool isFloatingPoint(const string &input) {
     // const regex pattern("^[+-]?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?$");
     const regex pattern(R"(^[+-]?[0-9]+(.[0-9]+)?([eE][+-]?[0-9]+)?$)");
     return regex_match(input, pattern);
-}
-
-// Receives and validates an integer number from the console
-int getInteger(const string &message, const int minValue, const int maxValue, const bool showRange, const string &errorMessage, const vector<int> &sentinelValues) {
-    string numberAsString; // Value typed by the user, that can be an integer or not
-    int number = 0; // Integer convertion (if possible) of the value typed by the user
-    bool keepAsking = true; // If we must keep asking for a value to the user, until receiving an integer
-
-    do {
-        cout << message << (showRange ? (" (" + to_string(minValue) + " - " + to_string(maxValue) + ")") : "") << ": ";
-        getline(cin, numberAsString);
-
-        if (!isInteger(numberAsString)) {
-            cout << "That's not an integer number. Try again." << endl;
-            continue; // There is no point in keep validating any further, as it's not even an integer
-        }
-
-        number = stoi(numberAsString); // When we reach this point, that means we have a proper integer
-        const bool invalidInput = number < minValue || maxValue < number; // If the input is valid, based only in minimum & maximum possible values
-        // If the typed number is not among the given sentinel values (breaking values)
-        const bool numberIsNotSentinel = count(sentinelValues.begin(), sentinelValues.end(), number) == 0;
-        keepAsking = invalidInput && numberIsNotSentinel;
-        if (keepAsking) cout << errorMessage << endl;
-    } while (keepAsking);
-
-    return number;
 }
 
 // Receives and validates a double number (or the equivalent of an integer) from the console
@@ -617,8 +409,7 @@ double getDouble(const string &message, const double minValue, const double maxV
 }
 
 bool containsSingleChar(const string &input) {
-    if (input.empty() || input.length() > 1) return false;
-    return true;
+    return input.length() == 1;
 }
 
 char getAlphaChar(const string &message, const string &errorMessage) {
@@ -654,40 +445,6 @@ string getStringFromMessage(const string &message) {
     return value;
 }
 
-// Gets a string with or without spaces, from the terminal
-string getString() {
-    string value;
-    getline(cin, value);
-    return value;
-}
-
-// Formats a given negative or positive int by inserting a comma every 3 digits of its equivalent string, to make it more readable, by US standards
-string humanizeInteger(const long long int integerValue) {
-    const bool isNegative = integerValue < 0;
-    string integerAsString = to_string(integerValue);
-    const int initialIndex = static_cast<int>(integerAsString.length() - 3);
-    // We insert commas into the string every three digits, fromm right to left.
-    for (int j = initialIndex; j > (isNegative ? 1 : 0); j -= 3) {
-        integerAsString.insert(j, ",");
-    }
-    return integerAsString;
-}
-
-// Formats a given negative or positive double by inserting a comma every 3 digits of its equivalent string, to make it more readable, by US standards
-string humanizeDouble(const long double doubleValue, const int precision) {
-    const auto integerValue = static_cast<long long int>(doubleValue);
-    const long double decimals = doubleValue - integerValue;
-    const bool hasNegativeDecimals = decimals < 0;
-
-    // Extracts into a string the decimal part, rounded to two significant digits
-    stringstream stream;
-    // Places the decimals into the stream, rounded to two significant digits (by default)
-    stream << fixed << setprecision(precision) << decimals;
-    // Extracts the decimals from the stream, as a string, still rounded to two significant digits (by default)
-    const string decimalsAsString = stream.str(); // It still includeds the zero & the dot. Ex: 0.34, -0.34 (the zero, and possibly also a negative sign, must be removed next)
-    return humanizeInteger(integerValue) + decimalsAsString.substr(hasNegativeDecimals ? 2 : 1, precision + 1);
-}
-
 // Formats a given positive int by inserting a comma every 3 digits of its equivalent string, to make it more readable, by US standards
 string humanizeUnsignedInteger(const unsigned long long int integerValue) {
     string integerAsString = to_string(integerValue);
@@ -712,438 +469,9 @@ string humanizeUnsignedDouble(const long double doubleValue, const int precision
     return humanizeUnsignedInteger(integerValue) + decimalsAsString.substr(1, precision + 1);
 }
 
-// Formats a given int by inserting a comma every 3 digits of its equivalent string, to make it more readable, and adds a customizable currency symbol
-string monetizeInteger(const unsigned long int integerValue, const bool prepend, const string &symbol) {
-    return static_cast<string>(prepend ? (symbol + " ") : "") + humanizeUnsignedInteger(integerValue) + static_cast<string>(prepend ? "" : " " + symbol);
-}
-
 // Formats a given double by inserting a comma every 3 digits of its equivalent string, to make it more readable, and adds a customizable currency symbol
 string monetizeDouble(const long double doubleValue, const int precision, const bool prepend, const string &symbol) {
     return static_cast<string>(prepend ? (symbol + " ") : "") + humanizeUnsignedDouble(doubleValue, precision) + static_cast<string>(prepend ? "" : " " + symbol);
-}
-
-// Rounds up a given double number, with a given amount of decimal places
-double roundUp(const double value, const int decimalPlaces) {
-    const double multiplier = pow(10.0, decimalPlaces);
-    return ceil(value * multiplier) / multiplier;
-}
-
-// Calculates the Recursive Sum of a given int number. Example: recursiveSum(5) == 5 + 4 + 3 + 2 + 1 = 15
-int recursiveSum(const unsigned long long int number) {
-    if (number != 0)
-        return number + recursiveSum(number - 1);
-    return 0;
-}
-
-// Returns the string gramatic representation of an ordinal number, from a given int number
-string ordinalFromNumber(const long long int number) {
-    const long long int lastDigit = number % 10;
-    string additive = "th";
-
-    switch (number) {
-        case 11:
-        case 12:
-        case 13:
-            break;
-        default:
-            switch (lastDigit) {
-                case 1:
-                    additive = "st";
-                    break;
-                case 2:
-                    additive = "nd";
-                    break;
-                case 3:
-                    additive = "rd";
-                    break;
-                default: ;
-            }
-    }
-
-    return to_string(number) + additive;
-}
-
-// Determines is a given int number is prime or not
-bool isPrime(const unsigned long long int value) {
-    if (value <= 1)
-        return false;
-    for (unsigned long long int i = 2; i <= value / 2; i++) {
-        if (value % i == 0)
-            return false;
-    }
-    return true;
-}
-
-// Calculates the sum of all the elements inside an array of integers
-int simpleSumOfIntegersInArray(const int integersArray[], const int length) {
-    int sum = 0;
-    for (int i = 0; i < length; i++) {
-        sum += integersArray[i];
-    }
-    return sum;
-}
-
-// Calculates the sum of all the elements inside an array of integers
-int neatSumOfIntegersInArray(const int integersArray[], const int length) {
-    return accumulate(integersArray, integersArray + length, 0);
-}
-
-// Calculates the sum of all the elements inside an array of integers
-template<int N>
-int sumOfIntegersWithRangeOverReference(int (&integersArray)[N]) {
-    int sum = 0;
-    for (auto number: integersArray) {
-        sum += number;
-    }
-    return sum;
-}
-
-// Calculates the sum of all the elements inside an array of doubles
-double simpleSumOfDoublesInArray(const double doublesArray[], const int length) {
-    double sum = 0.0;
-    for (int i = 0; i < length; i++) {
-        sum += doublesArray[i];
-    }
-    return sum;
-}
-
-// Calculates the sum of all the elements inside an array of doubles
-double neatSumOfDoublesInArray(const double doublesArray[], const int length) {
-    return accumulate(doublesArray, doublesArray + length, 0.0);
-}
-
-// Calculates the sum of all the elements inside an array of doubles
-template<int N>
-double templateSumOfDoublesInArray(double (&doublesArray)[N]) {
-    double sum = 0.0;
-    for (auto number: doublesArray) {
-        sum += number;
-    }
-    return sum;
-}
-
-// Calculates the sum of all the elements inside a two-dimensional array of doubles
-template<int N, int M>
-double templateSumOfDoublesInTwoDimensionsArray(double (&twoDimensionsDoublesArray)[N][M]) {
-    double sum = 0.0;
-
-    for (auto &row: twoDimensionsDoublesArray) {
-        for (auto &number: row) {
-            sum += number;
-        }
-    }
-
-    return sum;
-}
-
-// Calculates the average among all the numbers inside an array of integers
-double simpleAverageAmongIntegersInArray(const int array[], const int length) {
-    return simpleSumOfIntegersInArray(array, length) / static_cast<double>(length);
-}
-
-// Calculates the average among all the numbers inside an array of integers
-double neatAverageAmongIntegersInArray(const int array[], const int length) {
-    return neatSumOfIntegersInArray(array, length) / static_cast<double>(length);
-}
-
-// Calculates the average among all the numbers inside an array of integers
-template<int N>
-int templateAverageAmongIntegersInArray(int (&integersArray)[N]) {
-    const int length = sizeof(integersArray) / sizeof(integersArray[0]);
-    return sumOfIntegersWithRangeOverReference(integersArray) / length;
-}
-
-// Calculates the average among all the numbers inside an array of doubles
-double simpleAverageAmongDoublesInArray(const double array[], const int length) {
-    return simpleSumOfDoublesInArray(array, length) / length;
-}
-
-// Calculates the average among all the numbers inside an array of doubles
-double neatAverageAmongDoublesInArray(const double array[], const int length) {
-    return neatSumOfDoublesInArray(array, length) / length;
-}
-
-// Calculates the average among all the numbers inside an array of doubles
-template<int N>
-double templateAverageAmongDoublesInArray(double (&doublesArray)[N]) {
-    const int length = sizeof(doublesArray) / sizeof(doublesArray[0]);
-    return sumOfDoublesWithRangeOverReference(doublesArray) / length;
-}
-
-// Calculates the average among all the numbers inside an array of doubles
-template<int N, int M>
-double templateAverageAmongDoublesInTwoDimensionsArray(double (&doublesTwoDimensionalArray)[N][M]) {
-    const int rows = sizeof(doublesTwoDimensionalArray) / sizeof(doublesTwoDimensionalArray[0]);
-    const int columns = sizeof(doublesTwoDimensionalArray[0]) / sizeof(doublesTwoDimensionalArray[0][0]);
-
-    return templateSumOfDoublesInTwoDimensionsArray(doublesTwoDimensionalArray) / (rows * columns);
-}
-
-// Determines the highest number among an array of integers
-int simpleHighestIntegerInArray(const int integersArray[], const int length) {
-    int highestInteger = integersArray[0];
-    if (length == 1) return highestInteger;
-
-    for (int i = 1; i < length; i++) {
-        if (integersArray[i] > highestInteger)
-            highestInteger = integersArray[i];
-    }
-
-    return highestInteger;
-}
-
-// Determines the lower number among an array of integers
-int simpleLowerIntegerInArray(const int integersArray[], const int length) {
-    int lower = integersArray[0];
-    if (length == 1) return lower;
-
-    for (int i = 1; i < length; i++) {
-        if (integersArray[i] < lower)
-            lower = integersArray[i];
-    }
-
-    return lower;
-}
-
-// Determines the lower number among an array of doubles
-double simpleLowerDoubleInArray(const double doublesArray[], const int length) {
-    double lower = doublesArray[0];
-    if (length == 1) return lower;
-
-    for (int i = 1; i < length; i++) {
-        if (doublesArray[i] < lower)
-            lower = doublesArray[i];
-    }
-
-    return lower;
-}
-
-// Determines the higher number among an array of doubles
-double simpleHigherDoubleInArray(const double doublesArray[], const int length) {
-    double higher = doublesArray[0];
-    if (length == 1) return higher;
-
-    for (int i = 1; i < length; i++) {
-        if (doublesArray[i] > higher)
-            higher = doublesArray[i];
-    }
-
-    return higher;
-}
-
-// Determines the lower number among a two-dimensional array of doubles
-template<int N, int M>
-double templateLowerDoubleInTwoDimensionsArray(double (&twoDimensionsDoublesArray)[N][M]) {
-    const int rows = sizeof(twoDimensionsDoublesArray) / sizeof(twoDimensionsDoublesArray[0]);
-    const int columns = sizeof(twoDimensionsDoublesArray[0]) / sizeof(twoDimensionsDoublesArray[0][0]);
-    double lower = twoDimensionsDoublesArray[0][0];
-
-    for (int row = 0; row < rows; row++) {
-        for (int col = (row == 0 ? 1 : 0); col < columns; col++) {
-            if (const double number = twoDimensionsDoublesArray[row][col]; number < lower)
-                lower = number;
-        }
-    }
-
-    return lower;
-}
-
-// Determines the higher number among a two-dimensional array of doubles
-template<int N, int M>
-double templateHigherDoubleInTwoDimensionsArray(double (&twoDimensionsDoublesArray)[N][M]) {
-    const int rows = sizeof(twoDimensionsDoublesArray) / sizeof(twoDimensionsDoublesArray[0]);
-    const int columns = sizeof(twoDimensionsDoublesArray[0]) / sizeof(twoDimensionsDoublesArray[0][0]);
-    double higher = twoDimensionsDoublesArray[0][0];
-
-    for (int row = 0; row < rows; row++) {
-        for (int col = (row == 0 ? 1 : 0); col < columns; col++) {
-            if (const double number = twoDimensionsDoublesArray[row][col]; number > higher)
-                higher = number;
-        }
-    }
-
-    return higher;
-}
-
-// Determines if the given value is lower than the also given minimum value
-bool isInvalid(const long double value, const double minValue) {
-    return value < minValue;
-}
-
-// Prints on the terminal a text if the given value is lower than the also given minimum value
-void scoldUserIfInvalidInput(const long double value, const double minValue) {
-    if (isInvalid(value, minValue))
-        cout << "You must type a number greater or equal than " << minValue << ". Try again!" << endl;
-}
-
-// Function to validate the DateTime(YYYY-MM-DD HH:MM:SS)
-bool validDateTime(const string &datetimeAsString) {
-    if (datetimeAsString.empty()) return false;
-
-    // RegExp to check a valid DateTime(YYYY-MM-DD HH:MM:SS).
-    const regex pattern("^([0-9]{4})-(01|02|03|04|05|06|07|08|09|10|11|12)-([0-2][0-9]|30|31)"
-        "\\s([0-1][0-9]|[2][0-3]):([0-5][0-9]):([0-5][0-9])"
-        "$");
-
-    return regex_match(datetimeAsString, pattern);
-}
-
-// Function to extract all the components of a DateTime(YYYY-MM-DD HH:MM:SS)
-vector<string> getComponentsFromDateTime(const string &datetimeAsString) {
-    vector<string> dataComponents;
-
-    // RegExp to check a valid DateTime(YYYY-MM-DD HH:MM:SS).
-    const regex pattern("^([0-9]{4})-(01|02|03|04|05|06|07|08|09|10|11|12)-([0-2][0-9]|30|31)"
-        "\\s([0-1][0-9]|[2][0-3]):([0-5][0-9]):([0-5][0-9])"
-        "$");
-    smatch matches;
-
-    if (regex_search(datetimeAsString.begin(), datetimeAsString.end(), matches, pattern)) {
-        for (string match: matches) {
-            dataComponents.push_back(match);
-        }
-    }
-
-    return dataComponents;
-}
-
-// Function to extract the year from a DateTime(YYYY-MM-DD HH:MM:SS)
-string getYearFromDateTime(const string &datetimeAsString) {
-    vector<string> dateTimeComponents = getComponentsFromDateTime(datetimeAsString);
-    return dateTimeComponents.size() > 1 ? dateTimeComponents[1] : ""; // YYYY
-}
-
-// Function to extract the month from a DateTime(YYYY-MM-DD HH:MM:SS)
-string getMonthFromDateTime(const string &datetimeAsString) {
-    vector<string> dateTimeComponents = getComponentsFromDateTime(datetimeAsString);
-    return dateTimeComponents.size() > 1 ? dateTimeComponents[2] : ""; // MM
-}
-
-// Function to extract the day from a DateTime(YYYY-MM-DD HH:MM:SS)
-string getDayFromDateTime(const string &datetimeAsString) {
-    vector<string> dateTimeComponents = getComponentsFromDateTime(datetimeAsString);
-    return dateTimeComponents.size() > 1 ? dateTimeComponents[3] : ""; // DD
-}
-
-// Function to extract the hours from a DateTime(YYYY-MM-DD HH:MM:SS)
-string getHoursFromDateTime(const string &datetimeAsString) {
-    vector<string> dateTimeComponents = getComponentsFromDateTime(datetimeAsString);
-    return dateTimeComponents.size() > 1 ? dateTimeComponents[4] : ""; // HH
-}
-
-// Function to extract the minutes from a DateTime(YYYY-MM-DD HH:MM:SS)
-string getMinutesFromDateTime(const string &datetimeAsString) {
-    vector<string> dateTimeComponents = getComponentsFromDateTime(datetimeAsString);
-    return dateTimeComponents.size() > 1 ? dateTimeComponents[5] : ""; // MM
-}
-
-// Function to extract the seconds from a DateTime(YYYY-MM-DD HH:MM:SS)
-string getSecondsFromDateTime(const string &datetimeAsString) {
-    vector<string> dateTimeComponents = getComponentsFromDateTime(datetimeAsString);
-    return dateTimeComponents.size() > 1 ? dateTimeComponents[6] : ""; // SS
-}
-
-// Function to convert from a military Time (24 hours format) to civilian Time (12 hours format with meridian)
-string convertTimeToCivilian(const int militaryHours, const int minutes) {
-    string meridian;
-    int civilianHours;
-
-    // Handle midnight and noon
-    if (militaryHours == 0) {
-        civilianHours = 12;
-        meridian = "AM";
-    } else if (militaryHours == 12) {
-        civilianHours = 12;
-        meridian = "PM";
-    } else if (militaryHours < 12) {
-        civilianHours = militaryHours;
-        meridian = "AM";
-    } else {
-        civilianHours = militaryHours - 12;
-        meridian = "PM";
-    }
-
-    // cout << civilianHours << ":" << (minutes < 10 ? "0" : "") << minutes << meridian << endl;
-    return to_string(civilianHours) + ":" + (minutes < 10 ? "0" : "") + to_string(minutes) + " " + meridian;
-}
-
-// Detects if a given filename exist or not on the root of the executable file
-bool fileExist(const string &fileName) {
-    bool theFileExist = false; // If the file with text was already saved in the root of the executable
-
-    if (filesystem::exists(fileName))
-        theFileExist = true;
-
-    return theFileExist;
-}
-
-// Gets all the non-empty lines of text inside a given file name
-vector<string> getLinesFromFile(const string &fileName) {
-    ifstream inputFile(fileName);
-    vector<string> lines;
-
-    if (inputFile.is_open()) {
-        string line; // one single line at the time, to be read from the file
-
-        while (getline(inputFile, line)) {
-            if (!line.empty()) // If the line is empty then it's not interesting for us
-                lines.push_back(line);
-        }
-    } else {
-        cerr << "Error opening file\n";
-    }
-
-    // Closing the input file
-    inputFile.close();
-
-    return lines;
-}
-
-// Either creates a .txt file and adds text to it, or adds to an existent one
-void addTextToFile(const string &fileName) {
-    // Opens the input file & keeps the existing data (opens in append mode)
-    ofstream outputFile(fileName, ios_base::app);
-    // string textLine;
-
-    if (outputFile.is_open()) {
-        // We temporally store a single line of text, to be saved/added later to the .txt file
-        const string textLine = getStringFromMessage("Write a single line of text please: ");
-        if (!textLine.empty()) // There is no point on adding an empty string
-            outputFile << textLine << endl;
-    } else {
-        cerr << "Error opening file\n";
-    }
-
-    // Closing the output file
-    outputFile.close();
-}
-
-// Converts a giving string to lowercase
-void strToLowerCase(string &input) {
-    std::transform(input.begin(), input.end(), input.begin(),
-                   [](const unsigned char c) { return tolower(c); });
-}
-
-// Converts a giving string to uppercase
-void strToUpperCase(string &input) {
-    std::transform(input.begin(), input.end(), input.begin(),
-                   [](const unsigned char c) { return toupper(c); });
-}
-
-// Converts a string to lowercase and returns it
-string getLowerCase(string input) {
-    string destinationString = input;
-    std::transform(input.begin(), input.end(), destinationString.begin(),
-                   [](const unsigned char c) { return tolower(c); });
-    return destinationString;
-}
-
-// Converts a string to uppercase and returns it
-string getUpperCase(string input) {
-    string destinationString = input;
-    std::transform(input.begin(), input.end(), destinationString.begin(),
-                   [](const unsigned char c) { return toupper(c); });
-    return destinationString;
 }
 
 // Generates a Universally Unique IDentifier (the usual 36-character alphanumeric string. UUID style) as a string. Format: bdc0a2fb-d39e-0242-9a0a-4e760153f18d
