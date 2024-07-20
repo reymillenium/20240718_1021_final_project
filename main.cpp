@@ -47,7 +47,7 @@ using namespace std;
 
 constexpr int MAX_REG_HOURS = 40;
 constexpr int MAX_HOURS_WORKED = 50;
-constexpr int MAX_OT_HOURS = MAX_HOURS_WORKED - MAX_REG_HOURS;
+// constexpr int MAX_OT_HOURS = MAX_HOURS_WORKED - MAX_REG_HOURS;
 constexpr double MIN_HOURLY_WAGE = 10.00;
 constexpr double MAX_HOURLY_WAGE = 30.00;
 constexpr double FICA_RATE = .20;
@@ -1281,7 +1281,7 @@ void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
     cout << endl;
     const double regHours = getDouble("Please type how many regular hours the Employee worked", 1, MAX_REG_HOURS, true);;
     if (MAX_REG_HOURS <= regHours && regHours < MAX_HOURS_WORKED) // There is no point in asking for overtime if the employee dont even have the 40 weekly hours or if he already worked the legal maximum of 50
-        otHours = getDouble("Please type how many overtime hours the Employee worked", 1, MAX_HOURS_WORKED - MAX_REG_HOURS, true);
+        otHours = getDouble("Please type how many overtime hours the Employee worked", 1, MAX_HOURS_WORKED - regHours, true);
     payments.push_back(Payment {.employeeId = employee.id, .regHours = regHours, .otHours = otHours, .regRate = employee.regRate});
 }
 
@@ -1316,7 +1316,7 @@ void generateAndPrintCurrentEmployeePayrollReports(vector<Payment> &payments, co
         // And now we can finally send both to print
         printEmployeePayrollReports(additionEmployeePayrollReport, averageEmployeePayrollReport, employee);
     } else {
-        cout << "The selected employee do not have associated any payment. Good bye." << endl;
+        cout << "The selected employee has not received any payment yet. Good bye." << endl;
     }
 }
 
@@ -1437,14 +1437,14 @@ PayrollReport createAveragePayrollReport(const vector<Payment> &payments) {
 // Prints on the console both, the addition & average PayrollReports of the company
 void printCompanyPayrollReports(const PayrollReport &additionPR, const PayrollReport &averagePR) {
     cout << endl;
-    cout << "The company has made " << additionPR.paymentsAmount << " payments." << endl;
+    cout << "The company has made " << additionPR.paymentsAmount << " payment" << (additionPR.paymentsAmount == 1 ? "" : "s") << "." << endl;
     printPayrollReportsTable(additionPR, averagePR);
 }
 
 // Prints on the console both, the addition & average given EmployeePayrollReports
 void printEmployeePayrollReports(const EmployeePayrollReport &additionEPR, const EmployeePayrollReport &averageEPR, const Employee &employee) {
     cout << endl;
-    cout << "The employee " << employee.fullName() << ", with id " << employee.id << " has associated " << additionEPR.paymentsAmount << " payments." << endl;
+    cout << "The employee " << employee.fullName() << ", with id " << employee.id << " has received " << additionEPR.paymentsAmount << " payment" << (additionEPR.paymentsAmount == 1 ? "" : "s") << "." << endl;
     printPayrollReportsTable(additionEPR, averageEPR);
 }
 
