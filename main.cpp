@@ -47,9 +47,8 @@ constexpr char ADD_EMPLOYEE_OPTION = 'A';
 constexpr char DELETE_EMPLOYEE_OPTION = 'B';
 constexpr char SHOW_CURRENT_EMPLOYEES_OPTION = 'C';
 constexpr char ADD_PAYMENT_OPTION = 'D';
-
-constexpr char SHOW_ALL_THE_PAYMENTS_OPTION = 'E';
-constexpr char GENERATE_AND_PRINT_CURRENT_EPR_OPTION = 'F';
+constexpr char GENERATE_AND_PRINT_CURRENT_EPR_OPTION = 'E';
+constexpr char SHOW_ALL_THE_PAYMENTS_OPTION = 'F';
 constexpr char GENERATE_AND_PRINT_COMPANY_PR_OPTION = 'G';
 constexpr char QUITTING_OPTION = 'X';
 
@@ -527,9 +526,12 @@ void displayMenu(const bool hasEmployees, const bool hasPayments) {
         cout << ADD_PAYMENT_OPTION << " - Input a Payment for an existing Employee." << endl;
     }
 
+    if (hasEmployees && hasPayments) {
+        cout << GENERATE_AND_PRINT_CURRENT_EPR_OPTION << " - Print the Addition & Average Payroll Report only for a current & specific employee." << endl;
+    }
+
     if (hasPayments) {
         cout << SHOW_ALL_THE_PAYMENTS_OPTION << " - Show all the payments made by the company, even to ex employees" << endl;
-        cout << GENERATE_AND_PRINT_CURRENT_EPR_OPTION << " - Print the Addition & Average Payroll Report only for a current & specific employee." << endl;
         cout << GENERATE_AND_PRINT_COMPANY_PR_OPTION << " - Print the Addition & Average Payroll Report for all the company's employees." << endl;
     }
 
@@ -551,10 +553,12 @@ char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
     // We dinamically fill/conform the allowed menu options to choose from, depending of the existence or not of at least one employee & if we have at least one payment
     vector<char> allowedMenuOptions {ADD_EMPLOYEE_OPTION};
     const vector<char> ifHasEmployeesOptions {DELETE_EMPLOYEE_OPTION, SHOW_CURRENT_EMPLOYEES_OPTION, ADD_PAYMENT_OPTION};
-    const vector<char> ifHasPaymentsOptions {SHOW_ALL_THE_PAYMENTS_OPTION, GENERATE_AND_PRINT_CURRENT_EPR_OPTION, GENERATE_AND_PRINT_COMPANY_PR_OPTION};
+    const vector<char> ifHasEmployeesAndPaymentsOptions {GENERATE_AND_PRINT_CURRENT_EPR_OPTION};
+    const vector<char> ifHasPaymentsOptions {SHOW_ALL_THE_PAYMENTS_OPTION, GENERATE_AND_PRINT_COMPANY_PR_OPTION};
     const vector<char> noMatterWhatAndLastOptions {QUITTING_OPTION}; // Done this way so the validation message with the available options gets shown ordered alphabetically
 
     if (hasEmployees) allowedMenuOptions.insert(allowedMenuOptions.end(), ifHasEmployeesOptions.begin(), ifHasEmployeesOptions.end());
+    if (hasEmployees && hasPayments) allowedMenuOptions.insert(allowedMenuOptions.end(), ifHasEmployeesAndPaymentsOptions.begin(), ifHasEmployeesAndPaymentsOptions.end());
     if (hasPayments) allowedMenuOptions.insert(allowedMenuOptions.end(), ifHasPaymentsOptions.begin(), ifHasPaymentsOptions.end());
     allowedMenuOptions.insert(allowedMenuOptions.end(), noMatterWhatAndLastOptions.begin(), noMatterWhatAndLastOptions.end());
 
