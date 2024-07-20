@@ -127,7 +127,7 @@ struct Employee {
     string lastName;
     double regRate {0.0};
 
-    Employee() = default;
+    // Employee() = default;
 
     [[nodiscard]] string fullName() const { return firstName + " " + lastName; }
 };
@@ -144,7 +144,7 @@ struct Payment {
     double hoursWorked {0.0};
     double regRate {0.0};
 
-    Payment() = default;
+    // Payment() = default; // Prevents from using the cleaner designated list initializer syntax in MSVS
 
     [[nodiscard]] string fullName() const { return firstName + " " + lastName; }
 
@@ -169,7 +169,7 @@ struct PayrollReport {
     double fica {0.0};
     double socSec {0.0};
 
-    PayrollReport() = default;
+    // PayrollReport() = default;
 
     [[nodiscard]] double totalPay() const { return regPay + otPay; }
     [[nodiscard]] double totDeductions() const { return fica + socSec; }
@@ -186,7 +186,7 @@ struct EmployeePayrollReport : PayrollReport {
     string firstName;
     string lastName;
 
-    EmployeePayrollReport() = default;
+    // EmployeePayrollReport() = default;
 
     [[nodiscard]] string fullName() const { return firstName + " " + lastName; }
 };
