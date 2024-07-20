@@ -48,11 +48,16 @@ using namespace std;
 constexpr int MAX_REG_HOURS = 40;
 constexpr int MAX_HOURS_WORKED = 50;
 constexpr int MAX_OT_HOURS = MAX_HOURS_WORKED - MAX_REG_HOURS;
-constexpr double MIN_HOURLY_RATE = 10.00;
-constexpr double MAX_HOURLY_RATE = 30.00;
-constexpr double FICA_PCT = .20; //20 8 * 0.01
-constexpr double SS_MED_PCT = .0765;
+constexpr double MIN_HOURLY_WAGE = 10.00;
+constexpr double MAX_HOURLY_WAGE = 30.00;
+constexpr double FICA_RATE = .20;
+constexpr double SS_MED_RATE = .0765;
 constexpr double OT_MULT = 1.5;
+
+constexpr char ADD_EMPLOYEE_OPTION = 'A';
+constexpr char ADD_PAYMENT_OPTION = 'B';
+constexpr char GENERATE_AND_PRINT_CURRENT_EPR_OPTION = 'C';
+constexpr char GENERATE_AND_PRINT_COMPANY_PR_OPTION = 'D';
 constexpr char QUITTING_OPTION = 'X';
 
 
@@ -299,8 +304,8 @@ struct Payment {
     [[nodiscard]] double regPay() const { return regHours * regRate; }
     [[nodiscard]] double otPay() const { return otHours * otRate(); }
     [[nodiscard]] double totalPay() const { return regPay() + otPay(); }
-    [[nodiscard]] double fica() const { return totalPay() * FICA_PCT; }
-    [[nodiscard]] double socSec() const { return totalPay() * SS_MED_PCT; }
+    [[nodiscard]] double fica() const { return totalPay() * FICA_RATE; }
+    [[nodiscard]] double socSec() const { return totalPay() * SS_MED_RATE; }
     [[nodiscard]] double totDeductions() const { return fica() + socSec(); }
     [[nodiscard]] double netPay() const { return totalPay() - totDeductions(); }
 };
@@ -417,7 +422,7 @@ void printPayrollReportsTable(const PayrollReport &, const PayrollReport &);
 int main() {
     vector<Employee> employees; // Our current employees
     vector<Payment> payments; // All the payments performed by the company to the employees. That's all we need.
-    char menuSelection = 'A';
+    char menuSelection = ADD_EMPLOYEE_OPTION;
 
     // Shows once the program's welcoming message
     showProgramWelcome();
@@ -1157,11 +1162,11 @@ bool isValidMenuSelection(const char input, const vector<char> &allowedAnswers) 
 
 // Gets the option selected by the user, from the menu's options
 char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
-    char selection = 'A';
+    char selection = ADD_EMPLOYEE_OPTION;
     bool isInvalidAnswer;
-    vector<char> allowedAnswers {'A', 'X'};
-    const vector<char> ifHasEmployeesAnswers {'B'};
-    const vector<char> ifHasPaymentsAnswers {'C', 'D'};
+    vector<char> allowedAnswers {ADD_EMPLOYEE_OPTION, QUITTING_OPTION};
+    const vector<char> ifHasEmployeesAnswers {ADD_PAYMENT_OPTION};
+    const vector<char> ifHasPaymentsAnswers {GENERATE_AND_PRINT_CURRENT_EPR_OPTION, GENERATE_AND_PRINT_COMPANY_PR_OPTION};
     if (hasEmployees) allowedAnswers.insert(allowedAnswers.end(), ifHasEmployeesAnswers.begin(), ifHasEmployeesAnswers.end());
     if (hasPayments) allowedAnswers.insert(allowedAnswers.end(), ifHasPaymentsAnswers.begin(), ifHasPaymentsAnswers.end());
 
@@ -1186,16 +1191,16 @@ char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
 // Processes the selection made by the user from the menu
 void processMenuSelection(const char menuSelection, vector<Employee> &employees, vector<Payment> &payments) {
     switch (menuSelection) {
-        case 'A':
+        case ADD_EMPLOYEE_OPTION:
             addEmployee(employees);
             break;
-        case 'B':
+        case ADD_PAYMENT_OPTION:
             addPayment(payments, employees);
             break;
-        case 'C':
+        case GENERATE_AND_PRINT_CURRENT_EPR_OPTION:
             generateAndPrintCurrentEmployeePayrollReports(payments, employees);
             break;
-        case 'D':
+        case GENERATE_AND_PRINT_COMPANY_PR_OPTION:
             generateAndPrintCompanyPayrollReports(payments);
             break;
         default: ;
@@ -1242,7 +1247,7 @@ void addEmployee(vector<Employee> &employees) {
     cout << endl;
     const string firstName = getStringFromMessage("Please type the first name of the new Employee: ");
     const string lastName = getStringFromMessage("Please type the last name of the new Employee: ");
-    const double regRate = getDouble("Please type the regular payment rate of the new Employee", MIN_HOURLY_RATE, MAX_HOURLY_RATE, true);
+    const double regRate = getDouble("Please type the regular payment rate of the new Employee", MIN_HOURLY_WAGE, MAX_HOURLY_WAGE, true);
     employees.push_back(Employee {.id = getUuid(), .firstName = firstName, .lastName = lastName, .regRate = regRate});
 }
 
