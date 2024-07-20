@@ -1405,7 +1405,7 @@ void addPayment(vector<Payment> &payments, const vector<Employee> &employees) {
 // Adds an Employe's Payment structure variable to the reference of a given vector of Payments
 void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
     cout << endl;
-    const double hoursWorked = getDouble("Please type how many hours the Employee worked in total on the billing cycle", 1, MAX_HOURS_WORKED, true);;
+    const double hoursWorked = getDouble("Please type how many hours the Employee worked in total on the week", 1, MAX_HOURS_WORKED, true);;
     payments.push_back(Payment {.employeeId = employee.id, .firstName = employee.firstName, .lastName = employee.lastName, .hoursWorked = hoursWorked, .regRate = employee.regRate});
 }
 
@@ -1442,7 +1442,7 @@ void printPayments(const vector<Payment> &payments) {
 
     // Each one of the rows
     for (const Payment &payment: payments) {
-        cout << "| " << right << setw(largestFullNameLength) << setfill(' ') << left << payment.fullName() << " | " << right << setw(10) << payment.hoursWorked() << " | ";
+        cout << "| " << right << setw(largestFullNameLength) << setfill(' ') << left << payment.fullName() << " | " << right << setw(10) << payment.hoursWorked << " | ";
         cout << setw(7) << payment.regHours() << " | " << setw(8) << monetizeDouble(payment.regRate) << " | " << setw(6) << payment.otHours() << " | " << setw(7) << monetizeDouble(payment.otRate()) << " | ";
         cout << setw(12) << monetizeDouble(payment.regPay()) << " | " << setw(12) << monetizeDouble(payment.otPay()) << " | " << setw(12) << monetizeDouble(payment.totalPay()) << " | ";
         cout << setw(12) << monetizeDouble(payment.fica()) << " | " << setw(12) << monetizeDouble(payment.socSec()) << " | " << setw(12) << monetizeDouble(payment.totDeductions()) << " | ";
