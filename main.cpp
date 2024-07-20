@@ -56,10 +56,12 @@ constexpr double OT_MULT = 1.5;
 
 constexpr char ADD_EMPLOYEE_OPTION = 'A';
 constexpr char DELETE_EMPLOYEE_OPTION = 'B';
-constexpr char SHOW_EMPLOYEES_OPTION = 'C';
+constexpr char SHOW_CURRENT_EMPLOYEES_OPTION = 'C';
 constexpr char ADD_PAYMENT_OPTION = 'D';
-constexpr char GENERATE_AND_PRINT_CURRENT_EPR_OPTION = 'E';
-constexpr char GENERATE_AND_PRINT_COMPANY_PR_OPTION = 'F';
+
+constexpr char SHOW_ALL_THE_PAYMENTS_OPTION = 'E';
+constexpr char GENERATE_AND_PRINT_CURRENT_EPR_OPTION = 'F';
+constexpr char GENERATE_AND_PRINT_COMPANY_PR_OPTION = 'G';
 constexpr char QUITTING_OPTION = 'X';
 
 
@@ -293,13 +295,22 @@ struct Employee {
     [[nodiscard]] string fullName() const { return firstName + " " + lastName; }
 };
 
+// The Employee could be deleted from the system, but we still have its data (I'm not using an Employee,
+// to avoid theorically a DB persistence validation over the data layer [obviously none-existent, as we are not even using a DB in the first place])
+// But still in a real life scenario it would the best approach to avoid many issues, using an instance/object of a Class instead of structure variables
+// ...and we just need a few fields anyway, so it will remain denormalized with these 3 elements, instead of using an Employee structure variable
 struct Payment {
     string employeeId;
+    string firstName;
+    string lastName;
+
     double regHours {0.0};
     double otHours {0.0};
     double regRate {0.0};
 
     Payment() = default;
+
+    [[nodiscard]] string fullName() const { return firstName + " " + lastName; }
 
     [[nodiscard]] double hoursWorked() const { return regHours + otHours; }
     [[nodiscard]] double otRate() const { return regRate * OT_MULT; }
@@ -377,13 +388,25 @@ void showCurrentEmployeesTable(const vector<Employee> &);
 // Adds a Payment structure variable, associated to a specific Employee, to the reference of a given vector of Payments
 void addPayment(vector<Payment> &, const vector<Employee> &);
 
+// Gets the length of the pargest full name from a given vector of Employee structure variables
+int getLargestFullNameLength(const vector<Employee> &employees);
+
+// Gets the length of the pargest full name from a given vector of Payment structure variables
+int getLargestFullNameLength(const vector<Payment> &payments);
+
 void showEmployeesTable(const vector<Employee> &);
 
 // Prints an appropiate length "line" conformed by dashes, as part of a good looking table
-void renderLineUnderTableRow(int);
+void renderLineUnderEmployeesTableRow(int);
 
 // Adds a Payment structure variable to the reference of a given vector of Payments
 void addPaymentToEmployee(vector<Payment> &, const Employee &);
+
+// Prints on the terminal all the payments made by the company, including those to ex employees
+void printAllThePayments(const vector<Payment> &);
+
+// Prints on the terminal a given vector of Payment structure variables
+void printPayments(const vector<Payment> &);
 
 // Gets the option selected by the user, from the menu's options
 char getMenuSelection(bool, bool);
@@ -1170,11 +1193,12 @@ void displayMenu(const bool hasEmployees, const bool hasPayments) {
 
     if (hasEmployees) {
         cout << DELETE_EMPLOYEE_OPTION << " - Delete an Employee from our system." << endl;
-        cout << SHOW_EMPLOYEES_OPTION << " - Show all the employees in our system." << endl;
+        cout << SHOW_CURRENT_EMPLOYEES_OPTION << " - Show all the current/hired employees in our system." << endl;
         cout << ADD_PAYMENT_OPTION << " - Input a Payment for an existing Employee." << endl;
     }
 
     if (hasPayments) {
+        cout << SHOW_ALL_THE_PAYMENTS_OPTION << " - Show all the payments made by the company, even to ex employees" << endl;
         cout << GENERATE_AND_PRINT_CURRENT_EPR_OPTION << " - Print the Addition & Average Payroll Report only for a current & specific employee." << endl;
         cout << GENERATE_AND_PRINT_COMPANY_PR_OPTION << " - Print the Addition & Average Payroll Report for all the company's employees." << endl;
     }
@@ -1196,8 +1220,8 @@ char getMenuSelection(const bool hasEmployees, const bool hasPayments) {
 
     // We dinamically fill/conform the allowed menu options to choose from, depending of the existence or not of at least one employee & if we have at least one payment
     vector<char> allowedMenuOptions {ADD_EMPLOYEE_OPTION};
-    const vector<char> ifHasEmployeesOptions {DELETE_EMPLOYEE_OPTION, SHOW_EMPLOYEES_OPTION, ADD_PAYMENT_OPTION};
-    const vector<char> ifHasPaymentsOptions {GENERATE_AND_PRINT_CURRENT_EPR_OPTION, GENERATE_AND_PRINT_COMPANY_PR_OPTION};
+    const vector<char> ifHasEmployeesOptions {DELETE_EMPLOYEE_OPTION, SHOW_CURRENT_EMPLOYEES_OPTION, ADD_PAYMENT_OPTION};
+    const vector<char> ifHasPaymentsOptions {SHOW_ALL_THE_PAYMENTS_OPTION, GENERATE_AND_PRINT_CURRENT_EPR_OPTION, GENERATE_AND_PRINT_COMPANY_PR_OPTION};
     const vector<char> noMatterWhatAndLastOptions {QUITTING_OPTION}; // Done this way so the validation message with the available options gets shown ordered alphabetically
 
     if (hasEmployees) allowedMenuOptions.insert(allowedMenuOptions.end(), ifHasEmployeesOptions.begin(), ifHasEmployeesOptions.end());
@@ -1231,11 +1255,14 @@ void processMenuSelection(const char menuSelection, vector<Employee> &employees,
         case DELETE_EMPLOYEE_OPTION:
             deleteCurrentEmployee(employees);
             break;
-        case SHOW_EMPLOYEES_OPTION:
+        case SHOW_CURRENT_EMPLOYEES_OPTION:
             showCurrentEmployeesTable(employees);
             break;
         case ADD_PAYMENT_OPTION:
             addPayment(payments, employees);
+            break;
+        case SHOW_ALL_THE_PAYMENTS_OPTION:
+            printAllThePayments(payments);
             break;
         case GENERATE_AND_PRINT_CURRENT_EPR_OPTION:
             generateAndPrintCurrentEmployeePayrollReports(payments, employees);
@@ -1250,34 +1277,50 @@ void processMenuSelection(const char menuSelection, vector<Employee> &employees,
     }
 }
 
-void showEmployeesTable(const vector<Employee> &employees) {
-    cout << endl;
-    cout << "Ok, these are the current employees:" << endl;
-    cout << endl;
-
+// Gets the length of the pargest full name from a given vector of Employee structure variables
+int getLargestFullNameLength(const vector<Employee> &employees) {
     // Finds the largest full name's length among the employees using max_element
     const auto largestEmployeeFullNameFirstIterator = max_element(employees.begin(), employees.end(),
                                                                   [](const Employee &a, const Employee &b) {
                                                                       return a.fullName().size() < b.fullName().size();
                                                                   });
-    const int largestFullNameLength = static_cast<int>(largestEmployeeFullNameFirstIterator->fullName().size()); // Typecasting from size_t to int, just to avoid a warning
+    return static_cast<int>(largestEmployeeFullNameFirstIterator->fullName().size()); // Typecasting from size_t to int, just to avoid a warning
+}
+
+// Gets the length of the pargest full name from a given vector of Payment structure variables
+int getLargestFullNameLength(const vector<Payment> &payments) {
+    // Finds the largest full name's length among the payments done to employees, using max_element
+    const auto largestPaymentFullNameFirstIterator = max_element(payments.begin(), payments.end(),
+                                                                 [](const Payment &a, const Payment &b) {
+                                                                     return a.fullName().size() < b.fullName().size();
+                                                                 });
+    return static_cast<int>(largestPaymentFullNameFirstIterator->fullName().size()); // Typecasting from size_t to int, just to avoid a warning
+}
+
+void showEmployeesTable(const vector<Employee> &employees) {
+    cout << endl;
+    cout << "Ok, these are the current employees:" << endl;
+    cout << endl;
+
+    // Finds the length of the employee with the largest full name
+    const int largestFullNameLength = getLargestFullNameLength(employees);
 
     // Table Header
-    renderLineUnderTableRow(largestFullNameLength);
+    renderLineUnderEmployeesTableRow(largestFullNameLength);
     cout << "|                Unique ID             | Full Name ";
     printNTimes(" ", largestFullNameLength - 10);
     cout << " |" << endl;
-    renderLineUnderTableRow(largestFullNameLength);
+    renderLineUnderEmployeesTableRow(largestFullNameLength);
 
     // Each one of the rows
     for (const Employee &employee: employees) {
         cout << "| " << employee.id << " | " << setw(largestFullNameLength) << setfill(' ') << left << employee.fullName() << " |" << endl;
-        renderLineUnderTableRow(largestFullNameLength);
+        renderLineUnderEmployeesTableRow(largestFullNameLength);
     }
 }
 
 // Prints an appropiate length "line" conformed by dashes, as part of a good looking table
-void renderLineUnderTableRow(const int largestFullNameLength) {
+void renderLineUnderEmployeesTableRow(const int largestFullNameLength) {
     cout << "-----------------------------------------";
     printNTimes("-", largestFullNameLength);
     cout << "--" << endl;
@@ -1365,7 +1408,47 @@ void addPaymentToEmployee(vector<Payment> &payments, const Employee &employee) {
     const double regHours = getDouble("Please type how many regular hours the Employee worked", 1, MAX_REG_HOURS, true);;
     if (MAX_REG_HOURS <= regHours && regHours < MAX_HOURS_WORKED) // There is no point in asking for overtime if the employee dont even have the 40 weekly hours or if he already worked the legal maximum of 50
         otHours = getDouble("Please type how many overtime hours the Employee worked", 1, MAX_HOURS_WORKED - regHours, true);
-    payments.push_back(Payment {.employeeId = employee.id, .regHours = regHours, .otHours = otHours, .regRate = employee.regRate});
+    payments.push_back(Payment {.employeeId = employee.id, .firstName = employee.lastName, .lastName = employee.lastName, .regHours = regHours, .otHours = otHours, .regRate = employee.regRate});
+}
+
+// prints on the terminal all the payments made by the company, including those to ex employees
+void printAllThePayments(const vector<Payment> &payments) {
+    cout << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+    cout << "                 A L L   T H E   P A Y M E N T S                 " << endl;
+    cout << "-----------------------------------------------------------------" << endl;
+
+    // We send to print all the payments done by the company, including those to ex employees
+    printPayments(payments);
+}
+
+// Prints an appropiate length "line" conformed by dashes, as part of a good looking table
+void renderLineUnderPaymentsTableRow(const int largestFullNameLength) {
+    cout << "-----------------------------------------";
+    printNTimes("-", largestFullNameLength);
+    cout << "--" << endl;
+}
+
+// Prints on the terminal a given vector of Payment structure variables
+void printPayments(const vector<Payment> &payments) {
+    // We get the length of the payment done to the employee with the largest full name
+    const int largestFullNameLength = getLargestFullNameLength(payments);
+
+    cout << endl;
+
+
+    // Table Header
+    renderLineUnderPaymentsTableRow(largestFullNameLength);
+    cout << "|                Unique ID             | Full Name ";
+    printNTimes(" ", largestFullNameLength - 10);
+    cout << " |" << endl;
+    renderLineUnderPaymentsTableRow(largestFullNameLength);
+
+    // Each one of the rows
+    for (const Payment &payment: payments) {
+        cout << "| " << payment.employeeId << " | " << setw(largestFullNameLength) << setfill(' ') << left << payment.fullName() << " |" << endl;
+        renderLineUnderPaymentsTableRow(largestFullNameLength);
+    }
 }
 
 // Prints on the terminal a PayrollReport for a specific Employee
@@ -1533,7 +1616,7 @@ void printCompanyPayrollReports(const PayrollReport &additionPR, const PayrollRe
 // Prints on the console both, the addition & average given EmployeePayrollReports
 void printEmployeePayrollReports(const EmployeePayrollReport &additionEPR, const EmployeePayrollReport &averageEPR) {
     cout << endl;
-    cout << "The employee " << additionEPR.fullName() << ", with id " << additionEPR.employeeId << " has received " << additionEPR.paymentsAmount << " payment" << (additionEPR.paymentsAmount == 1 ? "" : "s") << "." << endl;
+    cout << "The employee " << additionEPR.fullName() << ", with ID " << additionEPR.employeeId << " has received " << additionEPR.paymentsAmount << " payment" << (additionEPR.paymentsAmount == 1 ? "" : "s") << "." << endl;
     printPayrollReportsTable(additionEPR, averageEPR);
 }
 
