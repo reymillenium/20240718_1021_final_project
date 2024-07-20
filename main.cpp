@@ -17,22 +17,13 @@
  **/
 
 #include <iostream>
-#include <string>  // for string, to_string, etc
-// #include <cmath> // for sqrt, sin, pow
-// #include <climits> // For SHRT_MAX, SHRT_MIN, etc
-// #include <limits> // For SHRT_MAX, SHRT_MIN, etc
-#include <iomanip> // for setprecision, setw, fixed
-#include<array>  // for array
-#include<random> // for random_device
-#include <cstdlib> // For rand and srand
-#include <ctime>   // For the time function
-#include <sstream> // for stringstream (used in humanizeInteger, humanizeDouble, etc)
-#include <vector> // to use vectors
-#include <fstream> // For ifstream, ofstrea, fstream
-#include <numeric> // For accumulate, transform_reduce, inner_product (in the vectors)
-#include <algorithm> // For max_element, min_element, find, transform (to use in vectors), or for max(), reverse, count_if, any_of, all_of, none_of, etc
-#include <regex> // For regex, regex_match
-// #include <cstring> // For strrev
+#include <string>
+#include <iomanip>
+#include<random>
+#include <sstream>
+#include <vector>
+#include <algorithm>
+#include <regex>
 
 using namespace std;
 
@@ -131,9 +122,9 @@ string getUUID();
 
 
 struct Employee {
+    string id;
     string firstName;
     string lastName;
-    string id;
     double regRate {0.0};
 
     Employee() = default;
@@ -191,9 +182,9 @@ struct EmployeePayrollReport : PayrollReport {
     // to avoid theorically a DB persistence validation over the data layer [obviously none-existent, as we are not even using a DB in the first place])
     // But still in a real life scenario it would the best approach to avoid many issues, using an instance/object of a Class instead of structure variables
     // ...and we just need a few fields anyway, so it will remain denormalized with these 3 elements, instead of using an Employee structure variable
+    string employeeId;
     string firstName;
     string lastName;
-    string employeeId;
 
     EmployeePayrollReport() = default;
 
