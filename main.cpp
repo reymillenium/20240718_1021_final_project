@@ -330,7 +330,9 @@ struct PayrollReport {
 
 // Logical Interpretation: An EmployeePayrollReport is a PayrollReport, plus adding an employee's id
 struct EmployeePayrollReport : PayrollReport {
-    // The Employee could be deleted from the system, but we still have its data (I'm not using an Employee, to avoid theorically a DB persistence validation)
+    // The Employee could be deleted from the system, but we still have its data (I'm not using an Employee,
+    // to avoid theorically a DB persistence validation over the data layer [obviously none-existent, as we are not even using a DB in the first place])
+    // But still in a real life scenario it would the best approach to avoid many issues, using an instance/object of a Class instead of structure variables
     // ...and we just need a few fields anyway, so it will remain denormalized with these 3 elements, instead of using an Employee structure variable
     string firstName;
     string lastName;
