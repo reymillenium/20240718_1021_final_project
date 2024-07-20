@@ -1,19 +1,31 @@
 /**
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                 *
- *   Name: Reinier Garcia Ramos                                    *
- *                                                                 *
- *   Program Title: Final Project (Payroll Pro 2.0)                *
- *                                                                 *
- *   Purpose:                                                      *
- *   Allows the user to enter the Employees data, their payments,  *
- *   as well as printing the addition & average Payroll Reports    *
- *   for a specific employee and for the whole company as well.    *
- *                                                                 *
- *   More Details:                                                 *
- *   https://github.com/reymillenium/20240718_1021_final_project   *
- *                                                                 *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                   *
+ *   Name: Reinier Garcia Ramos                                      *
+ *                                                                   *
+ *   Program Title: Final Project (Payroll Pro 2.0)                  *
+ *                                                                   *
+ *   Purpose:                                                        *
+ *   Allows the user to enter the Employees data, their payments,    *
+ *   as well as printing the addition & average Payroll Reports      *
+ *   for a specific employee and for the whole company as well.      *
+ *                                                                   *
+ *   Notes:                                                          *
+ *   This program requires at least c++20 on Microsoft Visual        *
+ *   Studio, as it uses designated initializers on the structure     *
+ *   variables.                                                      *
+ *                                                                   *
+ *   Instead, on MacOS with gcc Compiler Apple clang                 *
+ *   version 15.0.0 (clang-1500.3.9.4), it runs perfectly on c++17   *
+ *   from the CLion IDE 2024.1.4                                     *
+ *                                                                   *
+ *   It also runs perfectly fine on xCode using c++17 with the       *
+ *   Apple Clang Compiler.                                           *
+ *                                                                   *
+ *   More Details:                                                   *
+ *   https://github.com/reymillenium/20240718_1021_final_project     *
+ *                                                                   *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  **/
 
 #include <iostream>
