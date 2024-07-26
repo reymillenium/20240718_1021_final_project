@@ -357,7 +357,7 @@ void print(const T &);
 // Prints a given value, of almost any kind, N given times in the terminal
 template<typename T>
 void printNTimes(const T &item, const int times) {
-    for (int i = 0; i < times; i += 1) {
+    for (int i = 0; i < times; i++) {
         print(item);
     }
 }
@@ -365,9 +365,7 @@ void printNTimes(const T &item, const int times) {
 // Prints a given value, of almost any kind, N given times in the terminal, and then breaks the line
 template<typename T>
 void printNTimesAndBreak(const T &item, const int times) {
-    for (int i = 0; i < times; i += 1) {
-        print(item);
-    }
+    printNTimes(item, times);
     printLine("");
 }
 
